@@ -468,74 +468,18 @@
 
       <!-- #endregion TOTP Claims-->
 
-      <!-- #startregion Rampart Claims-->
-
-      <ClaimType Id="wiaInvitationRedeemed">
-        <DisplayName>Authorization result</DisplayName>
-        <DataType>boolean</DataType>
-      </ClaimType>
-      <ClaimType Id="wiaIsInvitationValid">
-        <DisplayName>Authorization result</DisplayName>
-        <DataType>boolean</DataType>
-      </ClaimType>
-      <ClaimType Id="wiaAuthorizationResult">
-        <DisplayName>Authorization result</DisplayName>
-        <DataType>string</DataType>
-      </ClaimType>
-      <ClaimType Id="wiaAuthorizationScope">
-        <DisplayName>Authorization scope</DisplayName>
-        <DataType>string</DataType>
-      </ClaimType>
-      <ClaimType Id="wiaAuthorizationMessage">
-        <DisplayName>Authorization message:</DisplayName>
-        <DataType>string</DataType>
-        <AdminHelpText>A claim responsible for holding response messages to send to the relying party</AdminHelpText>
-        <UserHelpText>A claim responsible for holding response messages to send to the relying party</UserHelpText>
-        <UserInputType>Paragraph</UserInputType>
-      </ClaimType>
       <ClaimType Id="ReadOnlyEmail">
         <DisplayName>Verified Email Address</DisplayName>
         <DataType>string</DataType>
         <UserInputType>Readonly</UserInputType>
       </ClaimType>
-      <ClaimType Id="applicationId">
-        <DisplayName>Application Id</DisplayName>
-        <DataType>string</DataType>
-      </ClaimType>
-      <ClaimType Id="invitationId">
-        <DisplayName>Invitation Id</DisplayName>
-        <DataType>string</DataType>
-      </ClaimType>
-      <ClaimType Id="errorMessage">
-        <DisplayName>Error</DisplayName>
-        <DataType>string</DataType>
-        <UserHelpText>Add help text here</UserHelpText>
-        <UserInputType>Paragraph</UserInputType>
-      </ClaimType>
-      <ClaimType Id="ComparisonResult">
-        <DisplayName>Authorization result</DisplayName>
-        <DataType>boolean</DataType>
-      </ClaimType>
-      <ClaimType Id="extension_forceMFAReset">
-        <DisplayName>Force MFA Reset</DisplayName>
-        <DataType>boolean</DataType>
-      </ClaimType>
+
       <ClaimType Id="userMessage">
         <DisplayName>User Message</DisplayName>
         <DataType>string</DataType>
         <UserHelpText>Add help text here</UserHelpText>
         <UserInputType>Paragraph</UserInputType>
       </ClaimType>
-      <ClaimType Id="appIdentifier">
-        <DisplayName>Client Id for OIDC - Issuer for SAML</DisplayName>
-        <DataType>string</DataType>
-      </ClaimType>
-      <ClaimType Id="authExecutionClientId">
-        <DisplayName>ClientId returned from API</DisplayName>
-        <DataType>string</DataType>
-      </ClaimType>
-
-      <!-- #endregion Rampart Claims-->
 
     </ClaimsSchema>
     <ClaimsTransformations>
@@ -1018,27 +962,6 @@
         </OutputClaims>
       </ClaimsTransformation>
 
-      <ClaimsTransformation Id="AuthorizationScopes" TransformationMethod="FormatStringClaim">
-        <InputClaims>
-          <InputClaim ClaimTypeReferenceId="wiaAuthorizationScope" TransformationClaimType="inputClaim" />
-        </InputClaims>
-        <InputParameters>
-          <InputParameter Id="stringFormat" DataType="string" Value="{0}" />
-        </InputParameters>
-        <OutputClaims>
-          <OutputClaim ClaimTypeReferenceId="scope" TransformationClaimType="outputClaim" />
-        </OutputClaims>
-      </ClaimsTransformation>
-
-      <ClaimsTransformation Id="CreateUnsolicitedErrorMessage" TransformationMethod="CreateStringClaim">
-        <InputParameters>
-          <InputParameter Id="value" DataType="string" Value="You cannot sign-up without invitation" />
-        </InputParameters>
-        <OutputClaims>
-          <OutputClaim ClaimTypeReferenceId="errorMessage" TransformationClaimType="createdClaim" />
-        </OutputClaims>
-      </ClaimsTransformation>
-
       <ClaimsTransformation Id="CopyEmailAddress" TransformationMethod="FormatStringClaim">
         <InputClaims>
           <InputClaim ClaimTypeReferenceId="email" TransformationClaimType="inputClaim" />
@@ -1049,24 +972,6 @@
         <OutputClaims>
           <OutputClaim ClaimTypeReferenceId="ReadOnlyEmail" TransformationClaimType="outputClaim" />
         </OutputClaims>
-      </ClaimsTransformation>
-
-      <ClaimsTransformation Id="AssertInvitationRedeemedIsTrue" TransformationMethod="AssertBooleanClaimIsEqualToValue">
-        <InputClaims>
-          <InputClaim ClaimTypeReferenceId="wiaInvitationRedeemed" TransformationClaimType="inputClaim" />
-        </InputClaims>
-        <InputParameters>
-          <InputParameter Id="valueToCompareTo" DataType="boolean" Value="true" />
-        </InputParameters>
-      </ClaimsTransformation>
-
-      <ClaimsTransformation Id="AssertIsInvitationValidIsTrue" TransformationMethod="AssertBooleanClaimIsEqualToValue">
-        <InputClaims>
-          <InputClaim ClaimTypeReferenceId="wiaIsInvitationValid" TransformationClaimType="inputClaim" />
-        </InputClaims>
-        <InputParameters>
-          <InputParameter Id="valueToCompareTo" DataType="boolean" Value="true" />
-        </InputParameters>
       </ClaimsTransformation>
 
     </ClaimsTransformations>
@@ -1419,41 +1324,6 @@
             <OutputClaimsTransformation ReferenceId="AssertSelectedMfaIsValid" />
           </OutputClaimsTransformations>
           <UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop" />
-        </TechnicalProfile>
-
-        <TechnicalProfile Id="AssertInvitationRedeemedBooleanIsTrue">
-          <DisplayName>Unit test</DisplayName>
-          <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.ClaimsTransformationProtocolProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
-          <OutputClaims>
-            <OutputClaim ClaimTypeReferenceId="ComparisonResult" DefaultValue="false" />
-          </OutputClaims>
-          <OutputClaimsTransformations>
-            <OutputClaimsTransformation ReferenceId="AssertInvitationRedeemedIsTrue" />
-          </OutputClaimsTransformations>
-          <UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop" />
-        </TechnicalProfile>
-
-        <TechnicalProfile Id="AssertInvitationValidBooleanIsTrue">
-          <DisplayName>Unit test</DisplayName>
-          <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.ClaimsTransformationProtocolProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
-          <OutputClaims>
-            <OutputClaim ClaimTypeReferenceId="ComparisonResult" DefaultValue="false" />
-          </OutputClaims>
-          <OutputClaimsTransformations>
-            <OutputClaimsTransformation ReferenceId="AssertIsInvitationValidIsTrue" />
-          </OutputClaimsTransformations>
-          <UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop" />
-        </TechnicalProfile>
-
-        <TechnicalProfile Id="SetAppIdentifier">
-          <DisplayName>Sign up with email</DisplayName>
-          <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.ClaimsTransformationProtocolProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
-          <Metadata>
-            <Item Key="IncludeClaimResolvingInClaimsHandling">true</Item>
-          </Metadata>
-          <OutputClaims>
-            <OutputClaim ClaimTypeReferenceId="appIdentifier" DefaultValue="{OIDC:ClientId}" AlwaysUseDefaultValue="true"/>
-          </OutputClaims>
         </TechnicalProfile>
 
       </TechnicalProfiles>
@@ -2567,26 +2437,6 @@
           <UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop" />
         </TechnicalProfile>
 
-        <!-- Demo: Show error message-->
-        <TechnicalProfile Id="SelfAsserted-Unsolicited">
-          <DisplayName>Unsolicited error message</DisplayName>
-          <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.SelfAssertedAttributeProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"/>
-          <Metadata>
-            <Item Key="ContentDefinitionReferenceId">api.selfasserted</Item>
-            <!-- Sample: Remove the continue button-->
-            <Item Key="setting.showContinueButton">false</Item>
-          </Metadata>
-          <InputClaimsTransformations>
-            <InputClaimsTransformation ReferenceId="CreateUnsolicitedErrorMessage" />
-          </InputClaimsTransformations>
-          <InputClaims>
-            <InputClaim ClaimTypeReferenceId="errorMessage"/>
-          </InputClaims>
-          <OutputClaims>
-            <OutputClaim ClaimTypeReferenceId="errorMessage"/>
-          </OutputClaims>
-        </TechnicalProfile>
-
         <TechnicalProfile Id="SelfAsserted-ShowCompletedPage">
           <DisplayName>Show blocked message</DisplayName>
           <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.SelfAssertedAttributeProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"/>
@@ -2606,105 +2456,6 @@
             <OutputClaim ClaimTypeReferenceId="userMessage"/>
           </OutputClaims>
           <UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop"/>
-        </TechnicalProfile>
-
-        <TechnicalProfile Id="SelfAsserted-ShowInvalidInvitationPage">
-          <DisplayName>Show blocked message</DisplayName>
-          <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.SelfAssertedAttributeProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"/>
-          <Metadata>
-            <Item Key="ContentDefinitionReferenceId">api.selfasserted</Item>
-            <Item Key="AllowGenerationOfClaimsWithNullValues">true</Item>
-            <Item Key="setting.showContinueButton">false</Item>
-            <Item Key="setting.showCancelButton">false</Item>
-          </Metadata>
-          <CryptographicKeys>
-            <Key Id="issuer_secret" StorageReferenceId="B2C_1A_TokenSigningKeyContainer"/>
-          </CryptographicKeys>
-          <InputClaims>
-            <InputClaim ClaimTypeReferenceId="userMessage" DefaultValue="Something went wrong. Invitation may be expired, revoked or already redeemed by the user."/>
-          </InputClaims>
-          <OutputClaims>
-            <OutputClaim ClaimTypeReferenceId="userMessage"/>
-          </OutputClaims>
-          <UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop"/>
-        </TechnicalProfile>
-
-        <TechnicalProfile Id="ShowBlockPage">
-          <DisplayName>Show blocked message</DisplayName>
-          <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.SelfAssertedAttributeProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"/>
-          <Metadata>
-            <Item Key="ContentDefinitionReferenceId">api.selfasserted</Item>
-            <!-- <Item Key="TokenLifeTimeInSeconds">3600</Item> -->
-            <Item Key="AllowGenerationOfClaimsWithNullValues">true</Item>
-            <Item Key="setting.showContinueButton">false</Item>
-            <Item Key="setting.showCancelButton">false</Item>
-          </Metadata>
-          <CryptographicKeys>
-            <Key Id="issuer_secret" StorageReferenceId="B2C_1A_TokenSigningKeyContainer"/>
-          </CryptographicKeys>
-          <InputClaims>
-            <InputClaim ClaimTypeReferenceId="wiaAuthorizationMessage" DefaultValue="You are not permitted access this app at this time. Please check back later."/>
-          </InputClaims>
-          <OutputClaims>
-            <OutputClaim ClaimTypeReferenceId="wiaAuthorizationMessage"/>
-          </OutputClaims>
-          <UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop"/>
-        </TechnicalProfile>
-
-        <TechnicalProfile Id="SelfAsserted-RedeemInvitation-UpdateAccount">
-          <DisplayName>Email signup</DisplayName>
-          <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.SelfAssertedAttributeProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
-          <Metadata>
-            <Item Key="IpAddressClaimReferenceId">IpAddress</Item>
-            <Item Key="ContentDefinitionReferenceId">api.localaccountsignup</Item>
-            <Item Key="language.button_continue">Continue</Item>
-            <Item Key="EnforceEmailVerification">False</Item>
-            <Item Key="UserMessageIfClaimsTransformationBooleanValueIsNotEqual">Invitation is not currently valid or has expired.</Item>
-          </Metadata>
-          <InputClaimsTransformations>
-            <InputClaimsTransformation ReferenceId="CopyEmailAddress" />
-          </InputClaimsTransformations>
-          <InputClaims>
-            <InputClaim ClaimTypeReferenceId="ReadOnlyEmail" />
-            <InputClaim ClaimTypeReferenceId="email" />
-            <InputClaim ClaimTypeReferenceId="displayName" />
-            <InputClaim ClaimTypeReferenceId="invitationId" />
-            <InputClaim ClaimTypeReferenceId="objectId" />
-          </InputClaims>
-          <DisplayClaims>
-            <DisplayClaim ClaimTypeReferenceId="ReadOnlyEmail" Required="true" />
-            <DisplayClaim ClaimTypeReferenceId="newPassword" Required="true" />
-            <DisplayClaim ClaimTypeReferenceId="reenterPassword" Required="true" />
-          </DisplayClaims>
-          <OutputClaims>
-            <OutputClaim ClaimTypeReferenceId="objectId" />
-            <OutputClaim ClaimTypeReferenceId="ReadOnlyEmail" Required="true" />
-            <OutputClaim ClaimTypeReferenceId="newPassword" Required="true" />
-            <OutputClaim ClaimTypeReferenceId="reenterPassword" Required="true" />
-            <OutputClaim ClaimTypeReferenceId="executed-SelfAsserted-Input" DefaultValue="true" />
-            <OutputClaim ClaimTypeReferenceId="authenticationSource" />
-            <OutputClaim ClaimTypeReferenceId="newUser" />            
-
-            <!--User is coming from email, so they are don't need to validate their email again -->
-            <OutputClaim ClaimTypeReferenceId="isActiveEmailSession"  DefaultValue="true" AlwaysUseDefaultValue="true"/>
-
-            <OutputClaim ClaimTypeReferenceId="displayName" />
-            <OutputClaim ClaimTypeReferenceId="givenName" />
-            <OutputClaim ClaimTypeReferenceId="surName" />
-          </OutputClaims>
-          <OutputClaimsTransformations>
-            <OutputClaimsTransformation ReferenceId="CopyEmailToSignInName"/>
-          </OutputClaimsTransformations>
-          <ValidationTechnicalProfiles>
-            <ValidationTechnicalProfile ReferenceId="REST-ValidateInvitation" />
-            <ValidationTechnicalProfile ReferenceId="AssertInvitationValidBooleanIsTrue" />
-
-            <ValidationTechnicalProfile ReferenceId="AAD-UserWritePasswordAndAccountEnabledUsingObjectId" />
-
-            <ValidationTechnicalProfile ReferenceId="REST-InvitationRedemptionV2" />
-            <ValidationTechnicalProfile ReferenceId="AssertInvitationRedeemedBooleanIsTrue" />
-          </ValidationTechnicalProfiles>
-          <UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop" />
         </TechnicalProfile>
 
       </TechnicalProfiles>
@@ -2930,13 +2681,7 @@
           </ClaimsExchanges>
         </OrchestrationStep>
 
-        <OrchestrationStep Order="2" Type="ClaimsExchange">
-          <ClaimsExchanges>
-            <ClaimsExchange Id="SetAppIdentifierExchange" TechnicalProfileReferenceId="SetAppIdentifier" />
-          </ClaimsExchanges>
-        </OrchestrationStep>
-
-        <OrchestrationStep Order="3" Type="CombinedSignInAndSignUp" ContentDefinitionReferenceId="api.signuporsignin">
+        <OrchestrationStep Order="2" Type="CombinedSignInAndSignUp" ContentDefinitionReferenceId="api.signuporsignin">
           <ClaimsProviderSelections>
             <ClaimsProviderSelection TargetClaimsExchangeId="ForgotPasswordExchange" />
             <ClaimsProviderSelection ValidationClaimsExchangeId="LocalAccountSigninEmailExchange" />
@@ -2947,7 +2692,7 @@
         </OrchestrationStep>
 
         <!-- Check if the user has selected to sign in using one of the social providers -->
-        <OrchestrationStep Order="4" Type="ClaimsExchange">
+        <OrchestrationStep Order="3" Type="ClaimsExchange">
           <Preconditions>
             <Precondition Type="ClaimsExist" ExecuteActionsIf="true">
               <Value>objectId</Value>
@@ -2961,7 +2706,7 @@
         </OrchestrationStep>
 
         <!--Sample: Start the password reset flow-->
-        <OrchestrationStep Order="5" Type="InvokeSubJourney">
+        <OrchestrationStep Order="4" Type="InvokeSubJourney">
           <Preconditions>
             <Precondition Type="ClaimsExist" ExecuteActionsIf="false">
               <Value>isPasswordResetFlow</Value>
@@ -2974,7 +2719,7 @@
         </OrchestrationStep>
 
         <!--Sample: Start the sign up flow-->
-        <OrchestrationStep Order="6" Type="InvokeSubJourney">
+        <OrchestrationStep Order="5" Type="InvokeSubJourney">
           <Preconditions>
             <Precondition Type="ClaimsExist" ExecuteActionsIf="false">
               <Value>isSignupFlow</Value>
@@ -2987,7 +2732,7 @@
         </OrchestrationStep>
 
         <!-- Track that the authentication step is completed -->
-        <OrchestrationStep Order="7" Type="ClaimsExchange">
+        <OrchestrationStep Order="6" Type="ClaimsExchange">
           <ClaimsExchanges>
             <ClaimsExchange Id="TrackAuthenticationComplete" TechnicalProfileReferenceId="AzureInsights-AuthenticationComplete" />
           </ClaimsExchanges>
@@ -2995,7 +2740,7 @@
 
         <!-- This step reads any user attributes that we may not have received when authenticating using ESTS so they can be sent
           in the token. -->
-        <OrchestrationStep Order="8" Type="ClaimsExchange">
+        <OrchestrationStep Order="7" Type="ClaimsExchange">
           <Preconditions>
             <Precondition Type="ClaimsExist" ExecuteActionsIf="false">
               <Value>objectId</Value>
@@ -3012,7 +2757,7 @@
           </ClaimsExchanges>
         </OrchestrationStep>
 
-        <OrchestrationStep Order="9" Type="InvokeSubJourney">
+        <OrchestrationStep Order="8" Type="InvokeSubJourney">
           <Preconditions>
             <Precondition Type="ClaimsExist" ExecuteActionsIf="true">
               <Value>objectIdFromSession</Value>
@@ -3030,7 +2775,7 @@
 
         <!-- Register MFA if not configured before [mfaoptions is empty] - applicable for sign up and sign in-->
 
-        <OrchestrationStep Order="10" Type="InvokeSubJourney">
+        <OrchestrationStep Order="9" Type="InvokeSubJourney">
           <Preconditions>
             <Precondition Type="ClaimsExist" ExecuteActionsIf="true">
               <Value>isActiveMfaSession-Any</Value>
@@ -3050,10 +2795,10 @@
           </JourneyList>
         </OrchestrationStep>
 
-        <OrchestrationStep Order="11" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="JwtIssuer" />
+        <OrchestrationStep Order="10" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="JwtIssuer" />
 
         <!-- Track that we have successfully sent a token -->
-        <OrchestrationStep Order="12" Type="ClaimsExchange">
+        <OrchestrationStep Order="11" Type="ClaimsExchange">
           <ClaimsExchanges>
             <ClaimsExchange Id="TrackTokenIssued" TechnicalProfileReferenceId="AzureInsights-TokenIssued" />
           </ClaimsExchanges>
@@ -3097,6 +2842,18 @@
         <OrchestrationStep Order="5" Type="InvokeSubJourney">
           <Preconditions>
             <Precondition Type="ClaimsExist" ExecuteActionsIf="true">
+              <Value>objectIdFromSession</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
+          </Preconditions>
+          <JourneyList>
+            <Candidate SubJourneyReferenceId="DFP-Verification" />
+          </JourneyList>
+        </OrchestrationStep>
+
+        <OrchestrationStep Order="6" Type="InvokeSubJourney">
+          <Preconditions>
+            <Precondition Type="ClaimsExist" ExecuteActionsIf="true">
               <Value>isActiveMfaSession-Any</Value>
               <Action>SkipThisOrchestrationStep</Action>
             </Precondition>
@@ -3106,16 +2863,16 @@
           </JourneyList>
         </OrchestrationStep>
 
-        <OrchestrationStep Order="6" Type="InvokeSubJourney">
+        <OrchestrationStep Order="7" Type="InvokeSubJourney">
           <JourneyList>
             <Candidate SubJourneyReferenceId="ChangeMFA-SubJourney" />
           </JourneyList>
         </OrchestrationStep>
 
-        <OrchestrationStep Order="7" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="JwtIssuer" />
+        <OrchestrationStep Order="8" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="JwtIssuer" />
 
         <!-- Track that we have successfully sent a token -->
-        <OrchestrationStep Order="8" Type="ClaimsExchange">
+        <OrchestrationStep Order="9" Type="ClaimsExchange">
           <ClaimsExchanges>
             <ClaimsExchange Id="TrackTokenIssued" TechnicalProfileReferenceId="AzureInsights-TokenIssued" />
           </ClaimsExchanges>
