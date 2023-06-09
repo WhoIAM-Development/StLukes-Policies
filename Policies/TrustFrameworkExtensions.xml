@@ -848,6 +848,30 @@
         </InputParameters>
       </ClaimsTransformation>
 
+      <ClaimsTransformation Id="AutoselectMfaOptionPhoneIfAvailable" TransformationMethod="CompareBooleanClaimToValue">
+        <InputClaims>
+          <InputClaim ClaimTypeReferenceId="smsMFASelected" TransformationClaimType="inputClaim" />
+        </InputClaims>
+        <InputParameters>
+          <InputParameter Id="valueToCompareTo" DataType="boolean" Value="true" />
+        </InputParameters>
+        <OutputClaims>
+          <OutputClaim  ClaimTypeReferenceId="Verify_MFAOption_Phone" TransformationClaimType="compareResult"/>
+        </OutputClaims>
+      </ClaimsTransformation>
+
+      <ClaimsTransformation Id="AutoselectMfaOptionTotpIfAvailable" TransformationMethod="CompareBooleanClaimToValue">
+        <InputClaims>
+          <InputClaim ClaimTypeReferenceId="totpMFASelected" TransformationClaimType="inputClaim" />
+        </InputClaims>
+        <InputParameters>
+          <InputParameter Id="valueToCompareTo" DataType="boolean" Value="true" />
+        </InputParameters>
+        <OutputClaims>
+          <OutputClaim  ClaimTypeReferenceId="Verify_MFAOption_TOTP" TransformationClaimType="compareResult"/>
+        </OutputClaims>
+      </ClaimsTransformation>
+
       <!-- MFA Option Transforms ends-->
 
       <!--TOTP Claim Transforms-->
@@ -1295,7 +1319,7 @@
       <DisplayName>Claims Transformation</DisplayName>
       <TechnicalProfiles>
         <TechnicalProfile Id="BreakAuthFlow">
-          <DisplayName>Validate Member Hash</DisplayName>
+          <DisplayName>Break Auth Flow</DisplayName>
           <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.ClaimsTransformationProtocolProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
           <InputClaims>
             <InputClaim ClaimTypeReferenceId="isBreakAuthFlow" DefaultValue="true"/>
@@ -1310,7 +1334,7 @@
         </TechnicalProfile>
 
         <TechnicalProfile Id="ValidateSelectedMfaOption">
-          <DisplayName>Validate Email Exists In OtherMails</DisplayName>
+          <DisplayName>Validate Selected MfaOption</DisplayName>
           <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.ClaimsTransformationProtocolProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
           <InputClaims>
             <InputClaim ClaimTypeReferenceId="MFAOptions_Verification" />
@@ -1322,6 +1346,24 @@
           <OutputClaimsTransformations>
             <OutputClaimsTransformation ReferenceId="DoesAvailableMfaOptionsConatinSelectedMfa" />
             <OutputClaimsTransformation ReferenceId="AssertSelectedMfaIsValid" />
+          </OutputClaimsTransformations>
+          <UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop" />
+        </TechnicalProfile>
+
+        <TechnicalProfile Id="MFA-Verify-AutoSelect">
+          <DisplayName>MFA Verify AutoSelect</DisplayName>
+          <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.ClaimsTransformationProtocolProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+          <InputClaims>
+            <InputClaim ClaimTypeReferenceId="smsMFASelected" />
+            <InputClaim ClaimTypeReferenceId="totpMFASelected" />
+          </InputClaims>
+          <OutputClaims>
+            <OutputClaim ClaimTypeReferenceId="Verify_MFAOption_Phone"  DefaultValue="false"/>
+            <OutputClaim ClaimTypeReferenceId="Verify_MFAOption_TOTP" DefaultValue="false"/>
+          </OutputClaims>
+          <OutputClaimsTransformations>
+            <OutputClaimsTransformation ReferenceId="AutoselectMfaOptionPhoneIfAvailable" />
+            <OutputClaimsTransformation ReferenceId="AutoselectMfaOptionTotpIfAvailable" />
           </OutputClaimsTransformations>
           <UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop" />
         </TechnicalProfile>
@@ -2143,33 +2185,9 @@
 
     <ClaimsProvider>
       <DisplayName>Local Account</DisplayName>
-      <TechnicalProfiles>
-        <TechnicalProfile Id="LocalAccountSignUpWithLogonEmail-DFP-Page1">
-          <DisplayName>Email signup</DisplayName>
-          <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.SelfAssertedAttributeProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
-          <Metadata>
-            <Item Key="IpAddressClaimReferenceId">IpAddress</Item>
-            <Item Key="ContentDefinitionReferenceId">api.localaccountsignup.verifyEmail</Item>
-          </Metadata>
-          <CryptographicKeys>
-            <Key Id="issuer_secret" StorageReferenceId="B2C_1A_TokenSigningKeyContainer" />
-          </CryptographicKeys>
-          <InputClaims>
-            <InputClaim ClaimTypeReferenceId="email" />
-            <InputClaim ClaimTypeReferenceId="userMessage" DefaultValue="Welcome to the Virginia IT Agency.  Please verify your email to continue creating your account." AlwaysUseDefaultValue="true"/>
-          </InputClaims>
-          <DisplayClaims>
-            <DisplayClaim ClaimTypeReferenceId="userMessage" />
-            <DisplayClaim DisplayControlReferenceId="emailVerificationControl-InputOrVerify" />
-          </DisplayClaims>
-          <OutputClaims>
-            <OutputClaim ClaimTypeReferenceId="email" Required="true" />
-            <OutputClaim ClaimTypeReferenceId="isActiveEmailSession"  DefaultValue="true" AlwaysUseDefaultValue="true"/>
-          </OutputClaims>
-          <UseTechnicalProfileForSessionManagement ReferenceId="SM-AAD" />
-        </TechnicalProfile>
+      <TechnicalProfiles>       
 
-        <TechnicalProfile Id="LocalAccountSignUpWithLogonEmail-DFP-Page2">
+        <TechnicalProfile Id="LocalAccountSignUpWithLogonEmail-DFP">
           <DisplayName>Email signup</DisplayName>
           <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.SelfAssertedAttributeProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
           <Metadata>
@@ -2183,8 +2201,8 @@
             <InputClaim ClaimTypeReferenceId="email" />
             <InputClaim ClaimTypeReferenceId="userMessage" DefaultValue="Please fill out your password and information to continue creating your account." AlwaysUseDefaultValue="true"/>
           </InputClaims>
-          <DisplayClaims>
-            <DisplayClaim ClaimTypeReferenceId="userMessage" />
+          <DisplayClaims>            
+            <DisplayClaim DisplayControlReferenceId="emailVerificationControl-InputOrVerify" />
             <DisplayClaim ClaimTypeReferenceId="givenName"/>
             <DisplayClaim ClaimTypeReferenceId="surName"/>
             <DisplayClaim ClaimTypeReferenceId="newPassword" Required="true"/>
@@ -2984,18 +3002,12 @@
 
         <OrchestrationStep Order="2" Type="ClaimsExchange">
           <ClaimsExchanges>
-            <ClaimsExchange Id="SignUpWithLogonEmailExchange1" TechnicalProfileReferenceId="LocalAccountSignUpWithLogonEmail-DFP-Page1" />
-          </ClaimsExchanges>
-        </OrchestrationStep>
-
-        <OrchestrationStep Order="3" Type="ClaimsExchange">
-          <ClaimsExchanges>
-            <ClaimsExchange Id="SignUpWithLogonEmailExchange2" TechnicalProfileReferenceId="LocalAccountSignUpWithLogonEmail-DFP-Page2" />
+            <ClaimsExchange Id="SignUpWithLogonEmailExchange" TechnicalProfileReferenceId="LocalAccountSignUpWithLogonEmail-DFP" />
           </ClaimsExchanges>
         </OrchestrationStep>
 
         <!-- Track that the sign up step is completed -->
-        <OrchestrationStep Order="4" Type="ClaimsExchange">
+        <OrchestrationStep Order="3" Type="ClaimsExchange">
           <ClaimsExchanges>
             <ClaimsExchange Id="TrackSignUpComplete" TechnicalProfileReferenceId="AzureInsights-SignUpComplete" />
           </ClaimsExchanges>
@@ -3289,6 +3301,11 @@
               <Value>MFAOptions</Value>
               <Action>SkipThisOrchestrationStep</Action>
             </Precondition>
+            <!--To skip MFA registration during password reset flow -->
+            <Precondition Type="ClaimsExist" ExecuteActionsIf="true">
+              <Value>isPasswordResetFlow</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
           </Preconditions>
           <JourneyList>
             <Candidate SubJourneyReferenceId="RegisterMFA-SubJourney" />
@@ -3388,13 +3405,39 @@
     <SubJourney Id="ChallengeMFA-SubJourney" Type="Call">
       <OrchestrationSteps>
 
-        <OrchestrationStep Order="1" Type="ClaimsExchange">
+        <!-- <OrchestrationStep Order="1" Type="ClaimsExchange">
           <ClaimsExchanges>
             <ClaimsExchange Id="RegisteredMfaOptionsCollectionExchange" TechnicalProfileReferenceId="GetRegisteredMfaOptionsCollection" />
           </ClaimsExchanges>
+        </OrchestrationStep> -->
+
+        <OrchestrationStep Order="1" Type="InvokeSubJourney">
+          <JourneyList>
+            <Candidate SubJourneyReferenceId="IdentifyNumberOfRegisteredMfaActions" />
+          </JourneyList>
         </OrchestrationStep>
 
         <OrchestrationStep Order="2" Type="ClaimsExchange">
+          <Preconditions>
+            <Precondition Type="ClaimEquals" ExecuteActionsIf="false">
+              <Value>numberOfRegisteredMfa</Value>
+              <Value>1</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
+          </Preconditions>
+          <ClaimsExchanges>
+            <ClaimsExchange Id="MFAVerifyAutoSelect" TechnicalProfileReferenceId="MFA-Verify-AutoSelect" />
+          </ClaimsExchanges>
+        </OrchestrationStep>
+
+        <OrchestrationStep Order="3" Type="ClaimsExchange">
+          <Preconditions>
+            <Precondition Type="ClaimEquals" ExecuteActionsIf="true">
+              <Value>numberOfRegisteredMfa</Value>
+              <Value>1</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
+          </Preconditions>
           <ClaimsExchanges>
             <ClaimsExchange Id="MFAVerifySelect" TechnicalProfileReferenceId="MFA-Verify-Select" />
           </ClaimsExchanges>
@@ -3414,7 +3457,7 @@
           </ClaimsExchanges>
         </OrchestrationStep> -->
 
-        <OrchestrationStep Order="3" Type="InvokeSubJourney">
+        <OrchestrationStep Order="4" Type="InvokeSubJourney">
           <Preconditions>
             <Precondition Type="ClaimsExist" ExecuteActionsIf="false">
               <Value>Verify_MFAOption_Phone</Value>
@@ -3431,7 +3474,7 @@
           </JourneyList>
         </OrchestrationStep>
 
-        <OrchestrationStep Order="4" Type="InvokeSubJourney">
+        <OrchestrationStep Order="5" Type="InvokeSubJourney">
           <Preconditions>
             <Precondition Type="ClaimsExist" ExecuteActionsIf="false">
               <Value>Verify_MFAOption_TOTP</Value>
@@ -3748,6 +3791,60 @@
     <SubJourney Id="SetMfaActions" Type="Call">
       <OrchestrationSteps>
 
+        <OrchestrationStep Order="1" Type="InvokeSubJourney">
+          <JourneyList>
+            <Candidate SubJourneyReferenceId="IdentifyNumberOfRegisteredMfaActions" />
+          </JourneyList>
+        </OrchestrationStep>
+
+        <!-- if numberOfRegisteredMfa=0, Available mfa action is only 'Add' -->
+        <OrchestrationStep Order="2" Type="ClaimsExchange">
+          <Preconditions>
+            <Precondition Type="ClaimEquals" ExecuteActionsIf="false">
+              <Value>numberOfRegisteredMfa</Value>
+              <Value>0</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
+          </Preconditions>
+          <ClaimsExchanges>
+            <ClaimsExchange Id="SetAvailableMfaActions-Add" TechnicalProfileReferenceId="SetAvailableMfaActions-Add" />
+          </ClaimsExchanges>
+        </OrchestrationStep>
+
+        <!-- if numberOfRegisteredMfa=1 Available mfa actions are 'Add/Update' -->
+        <OrchestrationStep Order="3" Type="ClaimsExchange">
+          <Preconditions>
+            <Precondition Type="ClaimEquals" ExecuteActionsIf="false">
+              <Value>numberOfRegisteredMfa</Value>
+              <Value>1</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
+          </Preconditions>
+          <ClaimsExchanges>
+            <ClaimsExchange Id="SetAvailableMfaActions-Add-Update" TechnicalProfileReferenceId="SetAvailableMfaActions-Add-Update" />
+          </ClaimsExchanges>
+        </OrchestrationStep>
+
+        <!-- if numberOfRegisteredMfa=2, Available mfa actions are 'Update/Remove' -->
+        <OrchestrationStep Order="4" Type="ClaimsExchange">
+          <Preconditions>
+            <Precondition Type="ClaimEquals" ExecuteActionsIf="false">
+              <Value>numberOfRegisteredMfa</Value>
+              <Value>2</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
+          </Preconditions>
+          <ClaimsExchanges>
+            <ClaimsExchange Id="SetAvailableMfaActions-Update-Remove" TechnicalProfileReferenceId="SetAvailableMfaActions-Update-Remove" />
+          </ClaimsExchanges>
+        </OrchestrationStep>
+
+      </OrchestrationSteps>
+    </SubJourney>
+
+    <SubJourney Id="IdentifyNumberOfRegisteredMfaActions" Type="Call">
+      <OrchestrationSteps>
+
         <OrchestrationStep Order="1" Type="ClaimsExchange">
           <ClaimsExchanges>
             <ClaimsExchange Id="SetRegisteredMFADefaultValue" TechnicalProfileReferenceId="SetRegisteredMFADefaultValue" />
@@ -3805,48 +3902,6 @@
           </Preconditions>
           <ClaimsExchanges>
             <ClaimsExchange Id="IncrementNumberOfRegisteredMfa-Totp" TechnicalProfileReferenceId="IncrementNumberOfRegisteredMfa" />
-          </ClaimsExchanges>
-        </OrchestrationStep>
-
-        <!-- if numberOfRegisteredMfa=0, Available mfa action is only 'Add' -->
-        <OrchestrationStep Order="6" Type="ClaimsExchange">
-          <Preconditions>
-            <Precondition Type="ClaimEquals" ExecuteActionsIf="false">
-              <Value>numberOfRegisteredMfa</Value>
-              <Value>0</Value>
-              <Action>SkipThisOrchestrationStep</Action>
-            </Precondition>
-          </Preconditions>
-          <ClaimsExchanges>
-            <ClaimsExchange Id="SetAvailableMfaActions-Add" TechnicalProfileReferenceId="SetAvailableMfaActions-Add" />
-          </ClaimsExchanges>
-        </OrchestrationStep>
-
-        <!-- if numberOfRegisteredMfa=1 Available mfa actions are 'Add/Update' -->
-        <OrchestrationStep Order="7" Type="ClaimsExchange">
-          <Preconditions>
-            <Precondition Type="ClaimEquals" ExecuteActionsIf="false">
-              <Value>numberOfRegisteredMfa</Value>
-              <Value>1</Value>
-              <Action>SkipThisOrchestrationStep</Action>
-            </Precondition>
-          </Preconditions>
-          <ClaimsExchanges>
-            <ClaimsExchange Id="SetAvailableMfaActions-Add-Update" TechnicalProfileReferenceId="SetAvailableMfaActions-Add-Update" />
-          </ClaimsExchanges>
-        </OrchestrationStep>
-
-        <!-- if numberOfRegisteredMfa=2, Available mfa actions are 'Update/Remove' -->
-        <OrchestrationStep Order="8" Type="ClaimsExchange">
-          <Preconditions>
-            <Precondition Type="ClaimEquals" ExecuteActionsIf="false">
-              <Value>numberOfRegisteredMfa</Value>
-              <Value>2</Value>
-              <Action>SkipThisOrchestrationStep</Action>
-            </Precondition>
-          </Preconditions>
-          <ClaimsExchanges>
-            <ClaimsExchange Id="SetAvailableMfaActions-Update-Remove" TechnicalProfileReferenceId="SetAvailableMfaActions-Update-Remove" />
           </ClaimsExchanges>
         </OrchestrationStep>
 
