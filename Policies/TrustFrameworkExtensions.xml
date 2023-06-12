@@ -491,6 +491,16 @@
         </Restriction>
       </ClaimType>
 
+      <ClaimType Id="myChartIdLinkingSelectedOption">
+        <DisplayName>Options:</DisplayName>
+        <DataType>string</DataType>
+         <UserInputType>RadioSingleSelect</UserInputType>
+        <Restriction>
+          <Enumeration Text="Experian" Value="experian" SelectByDefault="false" />
+          <Enumeration Text="Activation Code" Value="activation_Code" SelectByDefault="false" />
+        </Restriction>
+      </ClaimType>
+
       <ClaimType Id="activationCode">
         <DisplayName>Activation code</DisplayName>
         <DataType>string</DataType>        
@@ -2784,6 +2794,19 @@
             <OutputClaim ClaimTypeReferenceId="holdsActivationCode"/>
           </OutputClaims>          
           <UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop" />
+        </TechnicalProfile>
+
+        <TechnicalProfile Id="SelfAsserted-MyChartIdAccountLinking-OptExperianVsActivationCode">
+          <DisplayName>Opt experian vs activation code for account linking</DisplayName>
+          <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.SelfAssertedAttributeProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+          <Metadata>
+            <Item Key="ContentDefinitionReferenceId">api.selfasserted</Item>
+          </Metadata>
+          <IncludeInSso>false</IncludeInSso>
+          <OutputClaims>
+            <OutputClaim ClaimTypeReferenceId="myChartIdLinkingSelectedOption"/>
+          </OutputClaims>          
+          <UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop" />
         </TechnicalProfile>        
 
       </TechnicalProfiles>
@@ -2846,6 +2869,7 @@
             <OutputClaim ClaimTypeReferenceId="userPrincipalName" />
             <OutputClaim ClaimTypeReferenceId="MFAOptions" PartnerClaimType="extension_MfaOptions" />
             <OutputClaim ClaimTypeReferenceId="signInName" PartnerClaimType="signInNames.emailAddress" />
+            <OutputClaim ClaimTypeReferenceId="myChartId" PartnerClaimType="extension_myChartId" />
           </OutputClaims>
         </TechnicalProfile>
 
@@ -3082,7 +3106,7 @@
           </ClaimsExchanges>
         </OrchestrationStep>
 
-        <!--Sample: Start the password reset flow-->
+        <!--Start the password reset flow-->
         <OrchestrationStep Order="4" Type="InvokeSubJourney">
           <Preconditions>
             <Precondition Type="ClaimsExist" ExecuteActionsIf="false">
@@ -3095,7 +3119,7 @@
           </JourneyList>
         </OrchestrationStep>
 
-        <!--Sample: Start the sign up flow-->
+        <!--Start the sign up flow-->
         <OrchestrationStep Order="5" Type="InvokeSubJourney">
           <Preconditions>
             <Precondition Type="ClaimsExist" ExecuteActionsIf="false">
@@ -3187,10 +3211,26 @@
 
         <!-- Validate Chart Id -->
 
-        <OrchestrationStep Order="11" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="JwtIssuer" />
+        <OrchestrationStep Order="11" Type="InvokeSubJourney">
+          <Preconditions>
+            <Precondition Type="ClaimsExist" ExecuteActionsIf="true">
+              <Value>objectIdFromSession</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
+            <Precondition Type="ClaimsExist" ExecuteActionsIf="true">
+              <Value>myChartId</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
+          </Preconditions>
+          <JourneyList>
+            <Candidate SubJourneyReferenceId="MyChartIdAccountLinking" />
+          </JourneyList>
+        </OrchestrationStep>
+
+        <OrchestrationStep Order="12" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="JwtIssuer" />
 
         <!-- Track that we have successfully sent a token -->
-        <OrchestrationStep Order="12" Type="ClaimsExchange">
+        <OrchestrationStep Order="13" Type="ClaimsExchange">
           <ClaimsExchanges>
             <ClaimsExchange Id="TrackTokenIssued" TechnicalProfileReferenceId="AzureInsights-TokenIssued" />
           </ClaimsExchanges>
@@ -3497,6 +3537,72 @@
             <ClaimsExchange Id="SignUpWithLogonEmail-WithActivationCodeExchange" TechnicalProfileReferenceId="LocalAccountSignUpWithLogonEmail-WithActivationCode-RegisterUser" />
           </ClaimsExchanges>
         </OrchestrationStep>
+      </OrchestrationSteps>
+    </SubJourney>
+
+    <SubJourney Id="MyChartIdAccountLinking" Type="Call">
+      <OrchestrationSteps>
+
+        <OrchestrationStep Order="1" Type="ClaimsExchange">
+          <ClaimsExchanges>
+            <ClaimsExchange Id="SelfAsserted-MyChartIdAccountLinking-OptOptionExchange" TechnicalProfileReferenceId="SelfAsserted-MyChartIdAccountLinking-OptExperianVsActivationCode" />
+          </ClaimsExchanges>
+        </OrchestrationStep>
+
+        <OrchestrationStep Order="2" Type="ClaimsExchange">
+          <Preconditions>
+            <Precondition Type="ClaimsExist" ExecuteActionsIf="true">
+              <Value>myChartIdLinkingSelectedOption</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
+            <Precondition Type="ClaimEquals" ExecuteActionsIf="false">
+              <Value>myChartIdLinkingSelectedOption</Value>
+              <Value>activation_Code</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
+          </Preconditions>
+          <ClaimsExchanges>
+            <ClaimsExchange Id="MyChartId-WithActivationCode-CollectExchange" TechnicalProfileReferenceId="LocalAccountSignUpWithLogonEmail-WithActivationCode-CollectCode" />
+          </ClaimsExchanges>
+        </OrchestrationStep>
+
+        <OrchestrationStep Order="3" Type="ClaimsExchange">
+          <Preconditions>
+            <Precondition Type="ClaimsExist" ExecuteActionsIf="true">
+              <Value>myChartIdLinkingSelectedOption</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
+            <Precondition Type="ClaimEquals" ExecuteActionsIf="false">
+              <Value>myChartIdLinkingSelectedOption</Value>
+              <Value>activation_Code</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
+          </Preconditions> 
+          <ClaimsExchanges>
+            <ClaimsExchange Id="MyChartId-WithActivationCode-DemographicsExchange" TechnicalProfileReferenceId="LocalAccountSignUpWithLogonEmail-WithActivationCode-ShowDemographics" />
+          </ClaimsExchanges>
+        </OrchestrationStep>
+
+        <!-- <OrchestrationStep Order="3" Type="ClaimsExchange">
+          <Preconditions>
+            <Precondition Type="ClaimsExist" ExecuteActionsIf="true">
+              <Value>myChartIdLinkingSelectedOption</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
+            <Precondition Type="ClaimEquals" ExecuteActionsIf="false">
+              <Value>myChartIdLinkingSelectedOption</Value>
+              <Value>activation_Code</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
+          </Preconditions>
+          <ClaimsExchanges>
+            <ClaimsExchange Id="MyChartId-WithActivationCodeExchange" TechnicalProfileReferenceId="LocalAccountSignUpWithLogonEmail-WithActivationCode-RegisterUser" />
+          </ClaimsExchanges>
+        </OrchestrationStep> -->
+
+        <!-- Link MyChartId to the B2C account here -->
+
+        <!-- Code for experian flow if the selected option is experian -->
       </OrchestrationSteps>
     </SubJourney>
 
