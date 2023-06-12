@@ -481,6 +481,52 @@
         <UserInputType>Paragraph</UserInputType>
       </ClaimType>
 
+      <ClaimType Id="holdsActivationCode">
+        <DisplayName>Do you have an activation code?</DisplayName>
+        <DataType>string</DataType>
+         <UserInputType>RadioSingleSelect</UserInputType>
+        <Restriction>
+          <Enumeration Text="Yes" Value="True" SelectByDefault="false" />
+          <Enumeration Text="No" Value="False" SelectByDefault="false" />
+        </Restriction>
+      </ClaimType>
+
+      <ClaimType Id="activationCode">
+        <DisplayName>Activation code</DisplayName>
+        <DataType>string</DataType>        
+        <UserInputType>TextBox</UserInputType>
+      </ClaimType>
+
+      <ClaimType Id="dateOfBirth">
+        <DisplayName>Date of birth</DisplayName>
+        <DataType>date</DataType>
+        <UserHelpText>The date on which you were born.</UserHelpText>
+        <UserInputType>DateTimeDropdown</UserInputType>
+      </ClaimType>
+
+      <ClaimType Id="temp_objectId">
+        <DisplayName>User's Object ID</DisplayName>
+        <DataType>string</DataType>
+        <UserHelpText>Object identifier (ID) of the user object in Azure AD.</UserHelpText>
+      </ClaimType>
+
+      <ClaimType Id="myChartId">
+        <DisplayName>User's myChartId</DisplayName>
+        <DataType>string</DataType>        
+        <UserInputType>TextBox</UserInputType>
+      </ClaimType>
+
+      <ClaimType Id="myChartIdTemp">
+        <DisplayName>User's myChartId</DisplayName>
+        <DataType>string</DataType>        
+        <UserInputType>TextBox</UserInputType>
+      </ClaimType>
+
+      <ClaimType Id="isMyChartIdExist">
+        <DisplayName>To check MyChartId Exist</DisplayName>
+        <DataType>boolean</DataType>
+      </ClaimType>
+
     </ClaimsSchema>
     <ClaimsTransformations>
 
@@ -505,6 +551,15 @@
       <ClaimsTransformation Id="CreateMessageSignInRejected" TransformationMethod="CreateStringClaim">
         <InputParameters>
           <InputParameter Id="value" DataType="string" Value="Your sign-in was rejected by Fraud Protection." />
+        </InputParameters>
+        <OutputClaims>
+          <OutputClaim ClaimTypeReferenceId="userMessage" TransformationClaimType="createdClaim" />
+        </OutputClaims>
+      </ClaimsTransformation>
+
+      <ClaimsTransformation Id="CreateMessageSignUpSuccessfull-SignInNow" TransformationMethod="CreateStringClaim">
+        <InputParameters>
+          <InputParameter Id="value" DataType="string" Value="You've created your account, you now need to sign in." />
         </InputParameters>
         <OutputClaims>
           <OutputClaim ClaimTypeReferenceId="userMessage" TransformationClaimType="createdClaim" />
@@ -998,6 +1053,24 @@
         </OutputClaims>
       </ClaimsTransformation>
 
+      <ClaimsTransformation Id="DoesMyChartIdExist" TransformationMethod="DoesClaimExist">
+        <InputClaims>
+          <InputClaim ClaimTypeReferenceId="myChartId" TransformationClaimType="inputClaim" />
+        </InputClaims>
+        <OutputClaims>
+          <OutputClaim ClaimTypeReferenceId="isMyChartIdExist" TransformationClaimType="outputClaim" />
+        </OutputClaims>
+      </ClaimsTransformation>
+
+      <ClaimsTransformation Id="AssertMyChartIdExistIsFalse" TransformationMethod="AssertBooleanClaimIsEqualToValue">
+        <InputClaims>
+          <InputClaim ClaimTypeReferenceId="isMyChartIdExist" TransformationClaimType="inputClaim" />
+        </InputClaims>
+        <InputParameters>
+          <InputParameter Id="valueToCompareTo" DataType="boolean" Value="false" />
+        </InputParameters>
+      </ClaimsTransformation>
+
     </ClaimsTransformations>
 
     <DisplayControls>
@@ -1364,6 +1437,22 @@
           <OutputClaimsTransformations>
             <OutputClaimsTransformation ReferenceId="AutoselectMfaOptionPhoneIfAvailable" />
             <OutputClaimsTransformation ReferenceId="AutoselectMfaOptionTotpIfAvailable" />
+          </OutputClaimsTransformations>
+          <UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop" />
+        </TechnicalProfile>
+
+        <TechnicalProfile Id="ValidateUserChartId">
+          <DisplayName>Validate User Chart Id</DisplayName>
+          <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.ClaimsTransformationProtocolProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+          <InputClaims>
+            <InputClaim ClaimTypeReferenceId="myChartId" />
+          </InputClaims>
+          <OutputClaims>
+            <OutputClaim ClaimTypeReferenceId="isMyChartIdExist" DefaultValue="false"/>
+          </OutputClaims>
+          <OutputClaimsTransformations>
+            <OutputClaimsTransformation ReferenceId="DoesMyChartIdExist" />
+            <OutputClaimsTransformation ReferenceId="AssertMyChartIdExistIsFalse" />
           </OutputClaimsTransformations>
           <UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop" />
         </TechnicalProfile>
@@ -2187,7 +2276,7 @@
       <DisplayName>Local Account</DisplayName>
       <TechnicalProfiles>       
 
-        <TechnicalProfile Id="LocalAccountSignUpWithLogonEmail-DFP">
+        <TechnicalProfile Id="LocalAccountSignUpWithLogonEmail-WithoutActivationCode-DFP">
           <DisplayName>Email signup</DisplayName>
           <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.SelfAssertedAttributeProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
           <Metadata>
@@ -2299,6 +2388,201 @@
           <UseTechnicalProfileForSessionManagement ReferenceId="SM-AAD" />
         </TechnicalProfile>
 
+        <TechnicalProfile Id="LocalAccountSignUpWithLogonEmail-WithActivationCode-CollectCode">
+          <DisplayName>Email signup</DisplayName>
+          <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.SelfAssertedAttributeProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+          <Metadata>
+            <Item Key="IpAddressClaimReferenceId">IpAddress</Item>
+            <Item Key="ContentDefinitionReferenceId">api.localaccountsignup</Item>
+          </Metadata>
+          <CryptographicKeys>
+            <Key Id="issuer_secret" StorageReferenceId="B2C_1A_TokenSigningKeyContainer" />
+          </CryptographicKeys>
+          <OutputClaims>
+            <OutputClaim ClaimTypeReferenceId="dateOfBirth" Required="true" />
+            <OutputClaim ClaimTypeReferenceId="activationCode" Required="true" />
+          </OutputClaims>
+          <!-- Placeholder for the external API call -  dob and activation code.  -->
+          <!-- <ValidationTechnicalProfiles>
+            <ValidationTechnicalProfile ReferenceId="ApiCall-TBD" />
+          </ValidationTechnicalProfiles>   -->
+          <UseTechnicalProfileForSessionManagement ReferenceId="SM-AAD" />
+        </TechnicalProfile>
+
+        <TechnicalProfile Id="LocalAccountSignUpWithLogonEmail-WithActivationCode-ShowDemographics">
+          <DisplayName>Show Demographics</DisplayName>
+          <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.SelfAssertedAttributeProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+          <Metadata>
+            <Item Key="IpAddressClaimReferenceId">IpAddress</Item>
+            <Item Key="ContentDefinitionReferenceId">api.localaccountsignup</Item>
+          </Metadata>
+          <CryptographicKeys>
+            <Key Id="issuer_secret" StorageReferenceId="B2C_1A_TokenSigningKeyContainer" />
+          </CryptographicKeys>
+          <OutputClaims>
+            <OutputClaim ClaimTypeReferenceId="myChartIdTemp" Required="true" /> 
+          </OutputClaims>
+          <!-- Placeholder for the external API call - Verify demographics -->
+          <!-- <ValidationTechnicalProfiles> 
+            <ValidationTechnicalProfile ReferenceId="ApiCall-TBD" />
+          </ValidationTechnicalProfiles>   -->
+          <UseTechnicalProfileForSessionManagement ReferenceId="SM-AAD" />
+        </TechnicalProfile>
+
+        <TechnicalProfile Id="LocalAccountSignUpWithLogonEmail-WithActivationCode-RegisterUser">
+          <DisplayName>Email signup</DisplayName>
+          <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.SelfAssertedAttributeProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+          <Metadata>
+            <Item Key="IpAddressClaimReferenceId">IpAddress</Item>
+            <Item Key="ContentDefinitionReferenceId">api.localaccountsignup</Item>
+            <Item Key="UserMessageIfClaimsTransformationBooleanValueIsNotEqual">You are already registered, please sign in instead.</Item>
+          </Metadata>
+          <CryptographicKeys>
+            <Key Id="issuer_secret" StorageReferenceId="B2C_1A_TokenSigningKeyContainer" />
+          </CryptographicKeys>
+          <InputClaims>
+            <InputClaim ClaimTypeReferenceId="email" />
+            <InputClaim ClaimTypeReferenceId="myChartIdTemp" />
+            <InputClaim ClaimTypeReferenceId="userMessage" DefaultValue="Please fill out your password and information to continue creating your account." AlwaysUseDefaultValue="true"/>
+          </InputClaims>
+          <DisplayClaims>            
+            <DisplayClaim DisplayControlReferenceId="emailVerificationControl-InputOrVerify" />
+            <DisplayClaim ClaimTypeReferenceId="givenName"/>
+            <DisplayClaim ClaimTypeReferenceId="surName"/>
+            <DisplayClaim ClaimTypeReferenceId="newPassword" Required="true"/>
+            <DisplayClaim ClaimTypeReferenceId="reenterPassword"/>
+          </DisplayClaims>
+          <OutputClaims>
+            <OutputClaim ClaimTypeReferenceId="objectId" />
+            <OutputClaim ClaimTypeReferenceId="email"/>
+            <OutputClaim ClaimTypeReferenceId="newPassword" Required="true" />
+            <OutputClaim ClaimTypeReferenceId="reenterPassword" Required="true" />
+            <OutputClaim ClaimTypeReferenceId="executed-SelfAsserted-Input" DefaultValue="true" />
+            <OutputClaim ClaimTypeReferenceId="authenticationSource" />
+            <OutputClaim ClaimTypeReferenceId="newUser" />
+
+            <!-- Optional claims, to be collected from the user -->
+            <OutputClaim ClaimTypeReferenceId="givenName" />
+            <OutputClaim ClaimTypeReferenceId="surName" />
+
+            <OutputClaim ClaimTypeReferenceId="isActiveEmailSession"  DefaultValue="true" AlwaysUseDefaultValue="true"/>
+
+            <OutputClaim ClaimTypeReferenceId="dfp_merchantRuleDecision" />
+            <OutputClaim ClaimTypeReferenceId="dfp_Id" />
+            <OutputClaim ClaimTypeReferenceId="dfp_TransactionReferenceId"/>
+            <OutputClaim ClaimTypeReferenceId="dfp_botScore" />
+            <OutputClaim ClaimTypeReferenceId="dfp_riskScore" />
+            <OutputClaim ClaimTypeReferenceId="dfp_DeviceId"/>
+            <OutputClaim ClaimTypeReferenceId="dfp_TrueIp"/>
+            <OutputClaim ClaimTypeReferenceId="dfp_DeviceCountryCode"/>
+            <OutputClaim ClaimTypeReferenceId="dfp_DeviceState"/>
+            <OutputClaim ClaimTypeReferenceId="dfp_DeviceCity"/>
+            <OutputClaim ClaimTypeReferenceId="dfp_DevicePostalCode"/>
+            <OutputClaim ClaimTypeReferenceId="dfp_DeviceAsn"/>
+            <OutputClaim ClaimTypeReferenceId="dfp_Platform"/>
+            <OutputClaim ClaimTypeReferenceId="dfp_BrowserUserAgentLanguages"/>
+            <OutputClaim ClaimTypeReferenceId="dfp_BrowserUserAgent"/>
+            <OutputClaim ClaimTypeReferenceId="dfp_TcpDistance"/>
+            <OutputClaim ClaimTypeReferenceId="dfp_Carrier"/>
+            <OutputClaim ClaimTypeReferenceId="dfp_IpRoutingType"/>
+            <OutputClaim ClaimTypeReferenceId="dfp_Proxy"/>
+            <OutputClaim ClaimTypeReferenceId="dfp_UserAgentPlatform"/>
+            <OutputClaim ClaimTypeReferenceId="dfp_UserAgentBrowser"/>
+            <OutputClaim ClaimTypeReferenceId="dfp_UserAgentOperatingSystem"/>
+            <OutputClaim ClaimTypeReferenceId="dfp_EmailDomin"/>
+            <OutputClaim ClaimTypeReferenceId="dfp_EmailPattern"/>
+
+          </OutputClaims>
+          <ValidationTechnicalProfiles>
+            
+            <!-- Check if the user already exists. If yes, retrieve the chart id. -->
+            <ValidationTechnicalProfile ReferenceId="AAD-UserReadChartIdDetailsUsingEmailAddress-NoError" />
+
+            <ValidationTechnicalProfile ReferenceId="ValidateUserChartId">
+              <Preconditions>
+                <Precondition Type="ClaimsExist" ExecuteActionsIf="false">
+                  <Value>temp_objectId</Value>
+                  <Action>SkipThisValidationTechnicalProfile</Action>
+                </Precondition>
+              </Preconditions>
+            </ValidationTechnicalProfile>
+
+            <ValidationTechnicalProfile ReferenceId="REST-AcquireAccessToken" />
+
+            <ValidationTechnicalProfile ReferenceId="RestApi-DFP-CreateAccount" />
+
+            <ValidationTechnicalProfile ReferenceId="RestApi-DFP-CreateAccountStatus-Rejected">
+              <Preconditions>
+                <Precondition Type="ClaimsExist" ExecuteActionsIf="false">
+                  <Value>dfp_merchantRuleDecision</Value>
+                  <Action>SkipThisValidationTechnicalProfile</Action>
+                </Precondition>
+                <Precondition Type="ClaimEquals" ExecuteActionsIf="false">
+                  <Value>dfp_merchantRuleDecision</Value>
+                  <Value>Reject</Value>
+                  <Action>SkipThisValidationTechnicalProfile</Action>
+                </Precondition>
+                <Precondition Type="ClaimsExist" ExecuteActionsIf="false">
+                  <Value>temp_objectId</Value>
+                  <Action>SkipThisValidationTechnicalProfile</Action>
+                </Precondition>
+              </Preconditions>
+            </ValidationTechnicalProfile>           
+
+            <ValidationTechnicalProfile ReferenceId="AAD-UserWriteUsingLogonEmail-WithChartId-Custom">
+              <Preconditions>
+                <Precondition Type="ClaimsExist" ExecuteActionsIf="false">
+                  <Value>dfp_merchantRuleDecision</Value>
+                  <Action>SkipThisValidationTechnicalProfile</Action>
+                </Precondition>
+                <Precondition Type="ClaimEquals" ExecuteActionsIf="true">
+                  <Value>dfp_merchantRuleDecision</Value>
+                  <Value>Reject</Value>
+                  <Action>SkipThisValidationTechnicalProfile</Action>
+                </Precondition>
+                <Precondition Type="ClaimsExist" ExecuteActionsIf="true">
+                  <Value>temp_objectId</Value>
+                  <Action>SkipThisValidationTechnicalProfile</Action>
+                </Precondition>
+              </Preconditions>
+            </ValidationTechnicalProfile>
+
+            <ValidationTechnicalProfile ReferenceId="AAD-UserWriteLinkChartIdToUserUsingEmailAddress">
+              <Preconditions>
+                <Precondition Type="ClaimsExist" ExecuteActionsIf="false">
+                  <Value>dfp_merchantRuleDecision</Value>
+                  <Action>SkipThisValidationTechnicalProfile</Action>
+                </Precondition>
+                <Precondition Type="ClaimEquals" ExecuteActionsIf="true">
+                  <Value>dfp_merchantRuleDecision</Value>
+                  <Value>Reject</Value>
+                  <Action>SkipThisValidationTechnicalProfile</Action>
+                </Precondition>
+                <Precondition Type="ClaimsExist" ExecuteActionsIf="false">
+                  <Value>temp_objectId</Value>
+                  <Action>SkipThisValidationTechnicalProfile</Action>
+                </Precondition>
+              </Preconditions>
+            </ValidationTechnicalProfile>
+
+            <ValidationTechnicalProfile ReferenceId="RestApi-DFP-CreateAccountStatus-Approved">
+              <Preconditions>
+                <Precondition Type="ClaimsExist" ExecuteActionsIf="false">
+                  <Value>dfp_merchantRuleDecision</Value>
+                  <Action>SkipThisValidationTechnicalProfile</Action>
+                </Precondition>
+                <Precondition Type="ClaimEquals" ExecuteActionsIf="true">
+                  <Value>dfp_merchantRuleDecision</Value>
+                  <Value>Reject</Value>
+                  <Action>SkipThisValidationTechnicalProfile</Action>
+                </Precondition>
+              </Preconditions>
+            </ValidationTechnicalProfile>
+
+          </ValidationTechnicalProfiles>
+          <UseTechnicalProfileForSessionManagement ReferenceId="SM-AAD" />
+        </TechnicalProfile>
+
         <TechnicalProfile Id="LocalAccountDiscoveryUsingEmailAddress">
           <OutputClaims>
             <OutputClaim ClaimTypeReferenceId="isActiveEmailSession"  DefaultValue="true" AlwaysUseDefaultValue="true"/>
@@ -2385,6 +2669,19 @@
           <IncludeInSso>false</IncludeInSso>
           <InputClaimsTransformations>
             <InputClaimsTransformation ReferenceId="CreateMessageSignInRejected" />
+          </InputClaimsTransformations>
+          <IncludeTechnicalProfile ReferenceId="SelfAsserted-ShowMessage"/>
+        </TechnicalProfile>
+
+        <TechnicalProfile Id="SelfAsserted-ShowMessage-SignUpSuccessfull-SignInNow">
+          <DisplayName>ShowMessage-SignInRejected</DisplayName>
+          <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.SelfAssertedAttributeProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+          <Metadata>
+            <Item Key="UserMessageIfClaimsTransformationBooleanValueIsNotEqual">You've created your account, you now need to sign in.</Item>
+          </Metadata>
+          <IncludeInSso>false</IncludeInSso>
+          <InputClaimsTransformations>
+            <InputClaimsTransformation ReferenceId="CreateMessageSignUpSuccessfull-SignInNow" />
           </InputClaimsTransformations>
           <IncludeTechnicalProfile ReferenceId="SelfAsserted-ShowMessage"/>
         </TechnicalProfile>
@@ -2476,6 +2773,19 @@
           <UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop"/>
         </TechnicalProfile>
 
+        <TechnicalProfile Id="SelfAsserted-CheckForActivationCode">
+          <DisplayName>Check for sign up using activation code</DisplayName>
+          <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.SelfAssertedAttributeProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+          <Metadata>
+            <Item Key="ContentDefinitionReferenceId">api.localaccountsignup</Item>
+          </Metadata>
+          <IncludeInSso>false</IncludeInSso>
+          <OutputClaims>
+            <OutputClaim ClaimTypeReferenceId="holdsActivationCode"/>
+          </OutputClaims>          
+          <UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop" />
+        </TechnicalProfile>        
+
       </TechnicalProfiles>
     </ClaimsProvider>
 
@@ -2549,6 +2859,29 @@
           </OutputClaimsTransformations>
         </TechnicalProfile>
 
+        <TechnicalProfile Id="AAD-UserReadChartIdDetailsUsingEmailAddress-NoError">
+          <Metadata>
+            <Item Key="Operation">Read</Item>
+            <Item Key="RaiseErrorIfClaimsPrincipalDoesNotExist">false</Item>
+          </Metadata>
+          <IncludeInSso>false</IncludeInSso>
+          <InputClaims>
+            <InputClaim ClaimTypeReferenceId="email" PartnerClaimType="signInNames.emailAddress" Required="true" />
+          </InputClaims>
+          <OutputClaims>
+            <OutputClaim ClaimTypeReferenceId="temp_objectId" PartnerClaimType="objectId"/>
+            <OutputClaim ClaimTypeReferenceId="myChartId" PartnerClaimType="extension_myChartId" />
+          </OutputClaims>
+          <IncludeTechnicalProfile ReferenceId="AAD-Common" />
+        </TechnicalProfile>
+
+        <TechnicalProfile Id="AAD-UserWriteUsingLogonEmail-WithChartId-Custom">
+          <PersistedClaims>
+            <PersistedClaim ClaimTypeReferenceId="myChartIdTemp" PartnerClaimType="extension_myChartId" />
+          </PersistedClaims>  
+          <IncludeTechnicalProfile ReferenceId="AAD-UserWriteUsingLogonEmail-Custom"/>
+        </TechnicalProfile>
+
         <TechnicalProfile Id="AAD-UserWriteUsingLogonEmail-Custom">
           <Metadata>
             <Item Key="Operation">Write</Item>
@@ -2584,6 +2917,32 @@
           </OutputClaims>
           <IncludeTechnicalProfile ReferenceId="AAD-Common" />
           <UseTechnicalProfileForSessionManagement ReferenceId="SM-AAD" />
+        </TechnicalProfile>
+
+        <TechnicalProfile Id="AAD-UserWriteLinkChartIdToUserUsingEmailAddress">
+          <Metadata>
+            <Item Key="Operation">Write</Item>
+            <Item Key="RaiseErrorIfClaimsPrincipalAlreadyExists">false</Item>
+            <Item Key="RaiseErrorIfClaimsPrincipalDoesNotExist">true</Item>
+          </Metadata>
+          <IncludeInSso>false</IncludeInSso>
+          <InputClaims>
+            <InputClaim ClaimTypeReferenceId="email" PartnerClaimType="signInNames.emailAddress" Required="true" />
+          </InputClaims>
+          <PersistedClaims>
+            <PersistedClaim ClaimTypeReferenceId="email" PartnerClaimType="signInNames.emailAddress" />
+            <PersistedClaim ClaimTypeReferenceId="myChartIdTemp" PartnerClaimType="extension_myChartId" />
+          </PersistedClaims>
+          <OutputClaims>
+            <OutputClaim ClaimTypeReferenceId="myChartIdTemp" PartnerClaimType="extension_myChartId" />
+            <OutputClaim ClaimTypeReferenceId="newUser" PartnerClaimType="newClaimsPrincipalCreated" />
+            <OutputClaim ClaimTypeReferenceId="authenticationSource" DefaultValue="localAccountAuthentication" />
+            <OutputClaim ClaimTypeReferenceId="userPrincipalName" />
+            <OutputClaim ClaimTypeReferenceId="signInNames.emailAddress" />
+            <OutputClaim ClaimTypeReferenceId="displayName" />
+            <OutputClaim ClaimTypeReferenceId="objectId" />
+          </OutputClaims>
+          <IncludeTechnicalProfile ReferenceId="AAD-Common" />
         </TechnicalProfile>
 
         <TechnicalProfile Id="AAD-UserChangeEmailUsingObjectId">
@@ -2813,10 +3172,25 @@
           </JourneyList>
         </OrchestrationStep>
 
-        <OrchestrationStep Order="10" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="JwtIssuer" />
+        <!-- Block issuing token during signup. Ask user to sign in. -->
+        <OrchestrationStep Order="10" Type="ClaimsExchange">
+          <Preconditions>            
+            <Precondition Type="ClaimsExist" ExecuteActionsIf="false">
+              <Value>isSignupFlow</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
+          </Preconditions>
+          <ClaimsExchanges>
+            <ClaimsExchange Id="ShowMessage-SignInRejected" TechnicalProfileReferenceId="SelfAsserted-ShowMessage-SignUpSuccessfull-SignInNow" />
+          </ClaimsExchanges>
+        </OrchestrationStep>
+
+        <!-- Validate Chart Id -->
+
+        <OrchestrationStep Order="11" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="JwtIssuer" />
 
         <!-- Track that we have successfully sent a token -->
-        <OrchestrationStep Order="11" Type="ClaimsExchange">
+        <OrchestrationStep Order="12" Type="ClaimsExchange">
           <ClaimsExchanges>
             <ClaimsExchange Id="TrackTokenIssued" TechnicalProfileReferenceId="AzureInsights-TokenIssued" />
           </ClaimsExchanges>
@@ -3000,14 +3374,51 @@
           </ClaimsExchanges>
         </OrchestrationStep>
 
+        <!-- Check User has an Activation Code -->        
         <OrchestrationStep Order="2" Type="ClaimsExchange">
           <ClaimsExchanges>
-            <ClaimsExchange Id="SignUpWithLogonEmailExchange" TechnicalProfileReferenceId="LocalAccountSignUpWithLogonEmail-DFP" />
+            <ClaimsExchange Id="CheckForActivationCodeExchange" TechnicalProfileReferenceId="SelfAsserted-CheckForActivationCode" />
           </ClaimsExchanges>
         </OrchestrationStep>
 
-        <!-- Track that the sign up step is completed -->
+        <!-- Execute if the user doesn't have an activation code -->
         <OrchestrationStep Order="3" Type="ClaimsExchange">
+          <Preconditions>
+            <Precondition Type="ClaimsExist" ExecuteActionsIf="false">
+              <Value>holdsActivationCode</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
+            <Precondition Type="ClaimEquals" ExecuteActionsIf="true">
+              <Value>holdsActivationCode</Value>
+              <Value>True</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
+          </Preconditions>
+          <ClaimsExchanges>
+            <ClaimsExchange Id="SignUpWithLogonEmail-WithoutActivationCodeExchange" TechnicalProfileReferenceId="LocalAccountSignUpWithLogonEmail-WithoutActivationCode-DFP" />
+          </ClaimsExchanges>
+        </OrchestrationStep>
+
+        <!-- Execute if the user does have an activation code -->
+        <OrchestrationStep Order="4" Type="InvokeSubJourney">
+          <Preconditions>
+            <Precondition Type="ClaimsExist" ExecuteActionsIf="false">
+              <Value>holdsActivationCode</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
+            <Precondition Type="ClaimEquals" ExecuteActionsIf="true">
+              <Value>holdsActivationCode</Value>
+              <Value>False</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
+          </Preconditions>
+          <JourneyList>
+            <Candidate SubJourneyReferenceId="SignUp-WithActivationCode-DFP" />
+          </JourneyList>
+        </OrchestrationStep>
+
+        <!-- Track that the sign up step is completed -->
+        <OrchestrationStep Order="5" Type="ClaimsExchange">
           <ClaimsExchanges>
             <ClaimsExchange Id="TrackSignUpComplete" TechnicalProfileReferenceId="AzureInsights-SignUpComplete" />
           </ClaimsExchanges>
@@ -3064,6 +3475,28 @@
           </ClaimsExchanges>
         </OrchestrationStep>
 
+      </OrchestrationSteps>
+    </SubJourney>
+
+    <SubJourney Id="SignUp-WithActivationCode-DFP" Type="Call">
+      <OrchestrationSteps>
+        <OrchestrationStep Order="1" Type="ClaimsExchange">
+          <ClaimsExchanges>
+            <ClaimsExchange Id="SignUpWithLogonEmail-WithActivationCode-CollectExchange" TechnicalProfileReferenceId="LocalAccountSignUpWithLogonEmail-WithActivationCode-CollectCode" />
+          </ClaimsExchanges>
+        </OrchestrationStep>
+
+        <OrchestrationStep Order="2" Type="ClaimsExchange">
+          <ClaimsExchanges>
+            <ClaimsExchange Id="SignUpWithLogonEmail-WithActivationCode-DemographicsExchange" TechnicalProfileReferenceId="LocalAccountSignUpWithLogonEmail-WithActivationCode-ShowDemographics" />
+          </ClaimsExchanges>
+        </OrchestrationStep>
+
+        <OrchestrationStep Order="3" Type="ClaimsExchange">
+          <ClaimsExchanges>
+            <ClaimsExchange Id="SignUpWithLogonEmail-WithActivationCodeExchange" TechnicalProfileReferenceId="LocalAccountSignUpWithLogonEmail-WithActivationCode-RegisterUser" />
+          </ClaimsExchanges>
+        </OrchestrationStep>
       </OrchestrationSteps>
     </SubJourney>
 
