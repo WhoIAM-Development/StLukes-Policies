@@ -36,6 +36,7 @@
         <OutputClaim ClaimTypeReferenceId="dfp_merchantRuleDecision" />
         <OutputClaim ClaimTypeReferenceId="dfp_DeviceCountryCode" />
         <OutputClaim ClaimTypeReferenceId="scope" />
+        <OutputClaim ClaimTypeReferenceId="myChartId" />
         <OutputClaim ClaimTypeReferenceId="objectId" PartnerClaimType="sub"/>
         <OutputClaim ClaimTypeReferenceId="CorrelationId" DefaultValue="{Context:CorrelationId}"/>
         <OutputClaim ClaimTypeReferenceId="tenantId" AlwaysUseDefaultValue="true" DefaultValue="{Policy:TenantObjectId}" />

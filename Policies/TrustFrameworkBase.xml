@@ -524,7 +524,7 @@
         <Metadata>
           <Item Key="DisplayName">Collect information from user page</Item>
         </Metadata>
-      </ContentDefinition>
+      </ContentDefinition>      
 
       <ContentDefinition Id="api.selfasserted.profileupdate">
         <LoadUri>{Settings:UIBaseUrl}selfAsserted.html?ver={Settings:Build.BuildNumber}</LoadUri>

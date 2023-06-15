@@ -537,6 +537,202 @@
         <DataType>boolean</DataType>
       </ClaimType>
 
+      <!-- External Api Claims -->
+
+      <ClaimType Id="external_FirstName">
+        <DisplayName>First Name</DisplayName>
+        <DataType>string</DataType>        
+        <UserInputType>TextBox</UserInputType>
+      </ClaimType>
+
+      <ClaimType Id="external_MiddleName">
+        <DisplayName>Middle Name</DisplayName>
+        <DataType>string</DataType>        
+        <UserInputType>TextBox</UserInputType>
+      </ClaimType>
+
+      <ClaimType Id="external_LastName">
+        <DisplayName>Last Name</DisplayName>
+        <DataType>string</DataType>        
+        <UserInputType>TextBox</UserInputType>
+      </ClaimType>
+
+      <ClaimType Id="external_DateOfBirth">
+        <DisplayName>Date of birth</DisplayName>
+        <DataType>date</DataType>
+        <UserHelpText>The date on which you were born.</UserHelpText>
+        <UserInputType>DateTimeDropdown</UserInputType>
+      </ClaimType>
+
+      <ClaimType Id="external_Gender">
+        <DisplayName>Gender</DisplayName>
+        <DataType>string</DataType>
+        <UserInputType>RadioSingleSelect</UserInputType>
+        <Restriction>
+          <Enumeration Text="Male" Value="male" SelectByDefault="false" />
+          <Enumeration Text="Female" Value="female" SelectByDefault="false" />
+        </Restriction>
+      </ClaimType>
+
+      <ClaimType Id="external_Street">
+        <DisplayName>Street</DisplayName>
+        <DataType>string</DataType>        
+        <UserInputType>TextBox</UserInputType>
+      </ClaimType>
+
+      <ClaimType Id="external_Street2">
+        <DisplayName>Street 2</DisplayName>
+        <DataType>string</DataType>        
+        <UserInputType>TextBox</UserInputType>
+      </ClaimType>
+
+      <ClaimType Id="external_Phone">
+        <DisplayName>Phone</DisplayName>
+        <DataType>string</DataType>        
+        <UserInputType>TextBox</UserInputType>
+      </ClaimType>
+
+      <ClaimType Id="external_City">
+        <DisplayName>City</DisplayName>
+        <DataType>string</DataType>        
+        <UserInputType>TextBox</UserInputType>
+      </ClaimType>
+
+      <ClaimType Id="external_State">
+        <DisplayName>State</DisplayName>
+        <DataType>string</DataType>        
+        <UserInputType>TextBox</UserInputType>
+      </ClaimType>
+
+      <ClaimType Id="external_Zip">
+        <DisplayName>Zip</DisplayName>
+        <DataType>string</DataType>        
+        <UserInputType>TextBox</UserInputType>
+      </ClaimType>
+
+      <ClaimType Id="external_SessionId">
+        <DisplayName>Session Id</DisplayName>
+        <DataType>string</DataType>        
+        <UserInputType>Paragraph</UserInputType>
+      </ClaimType>
+
+      <ClaimType Id="external_ProfileId">
+        <DisplayName>Profile Id</DisplayName>
+        <DataType>string</DataType>        
+        <UserInputType>Paragraph</UserInputType>
+      </ClaimType>
+
+      <ClaimType Id="external_Question_1">
+        <DisplayName>Question 1</DisplayName>
+        <DataType>string</DataType>        
+        <UserInputType>Paragraph</UserInputType>
+      </ClaimType>
+
+      <ClaimType Id="external_Question_1_Answers">
+        <DisplayName>Question 1 Answers</DisplayName>
+        <DataType>string</DataType>        
+        <UserInputType>Readonly</UserInputType>
+      </ClaimType>
+
+      <!-- Claim to collect answer from the user. The claim name must follow the format {answer list claim name}_selected, 
+      as this format is used in JavaScript to identify its corresponding answer control for a question. -->
+      <ClaimType Id="external_Question_1_Answers_Selected">
+        <DisplayName>Question 1 Selected Answer</DisplayName>
+        <DataType>string</DataType>        
+        <UserInputType>TextBox</UserInputType>
+      </ClaimType>
+
+      <ClaimType Id="external_Question_2">
+        <DisplayName>Question 2</DisplayName>
+        <DataType>string</DataType>        
+        <UserInputType>Paragraph</UserInputType>
+      </ClaimType>
+
+      <ClaimType Id="external_Question_2_Answers">
+        <DisplayName>Question 2 Answers</DisplayName>
+        <DataType>string</DataType>        
+        <UserInputType>Readonly</UserInputType>
+      </ClaimType>
+
+      <!-- Claim to collect answer from the user. The claim name must follow the format {answer list claim name}_selected, 
+      as this format is used in JavaScript to identify its corresponding answer control for a question. -->
+      <ClaimType Id="external_Question_2_Answers_Selected">
+        <DisplayName>Question 2 Selected Answer</DisplayName>
+        <DataType>string</DataType>        
+        <UserInputType>TextBox</UserInputType>
+      </ClaimType>
+
+      <ClaimType Id="external_Question_3">
+        <DisplayName>Question 3</DisplayName>
+        <DataType>string</DataType>        
+        <UserInputType>Paragraph</UserInputType>
+      </ClaimType>
+
+      <ClaimType Id="external_Question_3_Answers">
+        <DisplayName>Question 3 Answers</DisplayName>
+        <DataType>string</DataType>        
+        <UserInputType>Readonly</UserInputType>
+      </ClaimType>
+
+      <!-- Claim to collect answer from the user. The claim name must follow the format {answer list claim name}_selected, 
+      as this format is used in JavaScript to identify its corresponding answer control for a question. -->
+      <ClaimType Id="external_Question_3_Answers_Selected">
+        <DisplayName>Question 3 Selected Answer</DisplayName>
+        <DataType>string</DataType>        
+        <UserInputType>TextBox</UserInputType>
+      </ClaimType>
+
+      <ClaimType Id="external_Question_4">
+        <DisplayName>Question 4</DisplayName>
+        <DataType>string</DataType>        
+        <UserInputType>Paragraph</UserInputType>
+      </ClaimType>
+
+      <ClaimType Id="external_Question_4_Answers">
+        <DisplayName>Question 4 Answers</DisplayName>
+        <DataType>string</DataType>        
+        <UserInputType>Readonly</UserInputType>
+      </ClaimType>
+
+      <!-- Claim to collect answer from the user. The claim name must follow the format {answer list claim name}_selected, 
+      as this format is used in JavaScript to identify its corresponding answer control for a question. -->
+      <ClaimType Id="external_Question_4_Answers_Selected">
+        <DisplayName>Question 4 Selected Answer</DisplayName>
+        <DataType>string</DataType>        
+        <UserInputType>TextBox</UserInputType>
+      </ClaimType>
+
+      <ClaimType Id="external_Question_5">
+        <DisplayName>Question 5</DisplayName>
+        <DataType>string</DataType>        
+        <UserInputType>Paragraph</UserInputType>
+      </ClaimType>
+
+      <ClaimType Id="external_Question_5_Answers">
+        <DisplayName>Question 5 Answers</DisplayName>
+        <DataType>string</DataType>        
+        <UserInputType>Readonly</UserInputType>
+      </ClaimType>
+
+      <!-- Claim to collect answer from the user. The claim name must follow the format {answer list claim name}_selected, 
+      as this format is used in JavaScript to identify its corresponding answer control for a question. -->
+      <ClaimType Id="external_Question_5_Answers_Selected">
+        <DisplayName>Question 5 Selected Answer</DisplayName>
+        <DataType>string</DataType>        
+        <UserInputType>TextBox</UserInputType>
+      </ClaimType>
+
+      <ClaimType Id="external_SelectedAnswers">
+        <DisplayName>Selected Answers Index</DisplayName>
+        <DataType>string</DataType>
+      </ClaimType>
+
+      <ClaimType Id="external_IsIdentityVerified">
+        <DisplayName>Is Identity Verified</DisplayName>
+        <DataType>boolean</DataType>        
+        <UserInputType>Readonly</UserInputType>
+      </ClaimType>
+
     </ClaimsSchema>
     <ClaimsTransformations>
 
@@ -1081,8 +1277,88 @@
         </InputParameters>
       </ClaimsTransformation>
 
-    </ClaimsTransformations>
+      <ClaimsTransformation Id="AddAnswerOneIndexToCsv" TransformationMethod="CopyClaim">
+        <InputClaims>
+          <InputClaim ClaimTypeReferenceId="external_Question_1_Answers_Selected" TransformationClaimType="inputClaim"/>
+        </InputClaims>
+        <OutputClaims>
+          <OutputClaim ClaimTypeReferenceId="external_SelectedAnswers" TransformationClaimType="outputClaim"/>
+        </OutputClaims>
+      </ClaimsTransformation>
 
+      <ClaimsTransformation Id="AddAnswerTwoIndexToCsv" TransformationMethod="FormatStringMultipleClaims">
+        <InputClaims>
+          <InputClaim ClaimTypeReferenceId="external_SelectedAnswers" TransformationClaimType="inputClaim1" />
+          <InputClaim ClaimTypeReferenceId="external_Question_2_Answers_Selected" TransformationClaimType="inputClaim2" />
+        </InputClaims>
+        <InputParameters>
+          <InputParameter Id="stringFormat" DataType="string" Value="{0},{1}" />
+        </InputParameters>
+        <OutputClaims>
+          <OutputClaim ClaimTypeReferenceId="external_SelectedAnswers" TransformationClaimType="outputClaim" />
+        </OutputClaims>
+      </ClaimsTransformation>
+
+      <ClaimsTransformation Id="AddAnswerThreeIndexToCsv" TransformationMethod="FormatStringMultipleClaims">
+        <InputClaims>
+          <InputClaim ClaimTypeReferenceId="external_SelectedAnswers" TransformationClaimType="inputClaim1" />
+          <InputClaim ClaimTypeReferenceId="external_Question_3_Answers_Selected" TransformationClaimType="inputClaim2" />
+        </InputClaims>
+        <InputParameters>
+          <InputParameter Id="stringFormat" DataType="string" Value="{0},{1}" />
+        </InputParameters>
+        <OutputClaims>
+          <OutputClaim ClaimTypeReferenceId="external_SelectedAnswers" TransformationClaimType="outputClaim" />
+        </OutputClaims>
+      </ClaimsTransformation>
+
+      <ClaimsTransformation Id="AddAnswerFourIndexToCsv" TransformationMethod="FormatStringMultipleClaims">
+        <InputClaims>
+          <InputClaim ClaimTypeReferenceId="external_SelectedAnswers" TransformationClaimType="inputClaim1" />
+          <InputClaim ClaimTypeReferenceId="external_Question_4_Answers_Selected" TransformationClaimType="inputClaim2" />
+        </InputClaims>
+        <InputParameters>
+          <InputParameter Id="stringFormat" DataType="string" Value="{0},{1}" />
+        </InputParameters>
+        <OutputClaims>
+          <OutputClaim ClaimTypeReferenceId="external_SelectedAnswers" TransformationClaimType="outputClaim" />
+        </OutputClaims>
+      </ClaimsTransformation>
+
+      <ClaimsTransformation Id="AddAnswerFiveIndexToCsv" TransformationMethod="FormatStringMultipleClaims">
+        <InputClaims>
+          <InputClaim ClaimTypeReferenceId="external_SelectedAnswers" TransformationClaimType="inputClaim1" />
+          <InputClaim ClaimTypeReferenceId="external_Question_5_Answers_Selected" TransformationClaimType="inputClaim2" />
+        </InputClaims>
+        <InputParameters>
+          <InputParameter Id="stringFormat" DataType="string" Value="{0},{1}" />
+        </InputParameters>
+        <OutputClaims>
+          <OutputClaim ClaimTypeReferenceId="external_SelectedAnswers" TransformationClaimType="outputClaim" />
+        </OutputClaims>
+      </ClaimsTransformation>
+
+      <ClaimsTransformation Id="AssertIdentityVerifiedIsTrue" TransformationMethod="AssertBooleanClaimIsEqualToValue">
+        <InputClaims>
+          <InputClaim ClaimTypeReferenceId="external_IsIdentityVerified" TransformationClaimType="inputClaim" />
+        </InputClaims>
+        <InputParameters>
+          <InputParameter Id="valueToCompareTo" DataType="boolean" Value="true" />
+        </InputParameters>
+      </ClaimsTransformation>
+
+    </ClaimsTransformations>
+    
+    <ContentDefinitions>
+      <ContentDefinition Id="api.selfasserted.collectQuestionAnswers">
+        <LoadUri>{Settings:UIBaseUrl}collectQuestionAnswer.html?ver={Settings:Build.BuildNumber}</LoadUri>
+        <RecoveryUri>~/common/default_page_error.html</RecoveryUri>
+        <DataUri>urn:com:microsoft:aad:b2c:elements:contract:selfasserted:2.1.7</DataUri>
+        <Metadata>
+          <Item Key="DisplayName">Collect information from user page</Item>
+        </Metadata>
+      </ContentDefinition>
+    </ContentDefinitions>  
     <DisplayControls>
       <DisplayControl Id="emailVerificationControl-Verify" UserInterfaceControlType="VerificationControl">
         <InputClaims>
@@ -1172,7 +1448,7 @@
   <ClaimsProviders>
 
     <ClaimsProvider>
-      <DisplayName>DFP Intermediate APIs</DisplayName>
+      <DisplayName>Intermediate APIs</DisplayName>
       <TechnicalProfiles>
         <TechnicalProfile Id="REST-AcquireAccessToken">
           <DisplayName></DisplayName>
@@ -1395,6 +1671,83 @@
           </InputClaims>
           <IncludeTechnicalProfile ReferenceId="RestApi-DFP-LoginAccountStatus"/>
         </TechnicalProfile>
+
+        <TechnicalProfile Id="RestApi-UserValidation-GetQuestions">
+          <DisplayName>DFP Create Account</DisplayName>
+          <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.RestfulProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+          <Metadata>
+            <Item Key="ServiceUrl">{Settings:IntermediateAppUrl}/api/UserValidation/Question</Item>
+            <Item Key="AuthenticationType">Bearer</Item>
+            <Item Key="SendClaimsIn">Body</Item>
+            <Item Key="AllowInsecureAuthInProduction">True</Item>
+            <Item Key="IncludeClaimResolvingInClaimsHandling">true</Item>
+            <Item Key="UseClaimAsBearerToken">bearerToken</Item>
+            <Item Key="ResolveJsonPathsInJsonTokens">true</Item>
+          </Metadata>
+          <InputClaims>
+            <InputClaim ClaimTypeReferenceId="bearerToken" />
+
+            <InputClaim ClaimTypeReferenceId="external_FirstName" PartnerClaimType="FirstName" />
+            <InputClaim ClaimTypeReferenceId="external_MiddleName" PartnerClaimType="MiddleName" />
+            <InputClaim ClaimTypeReferenceId="external_LastName" PartnerClaimType="LastName" />
+            <InputClaim ClaimTypeReferenceId="external_DateOfBirth" PartnerClaimType="DateOfBirth" />
+            <InputClaim ClaimTypeReferenceId="external_Gender" PartnerClaimType="Gender" />
+            <InputClaim ClaimTypeReferenceId="external_Street" PartnerClaimType="Street" />
+            <InputClaim ClaimTypeReferenceId="external_Street2" PartnerClaimType="Street2" />
+            <InputClaim ClaimTypeReferenceId="external_Phone" PartnerClaimType="PhoneNumber" />
+            <InputClaim ClaimTypeReferenceId="external_City" PartnerClaimType="City" />
+            <InputClaim ClaimTypeReferenceId="external_State" PartnerClaimType="State" />
+            <InputClaim ClaimTypeReferenceId="external_Zip" PartnerClaimType="ZipCode" />
+            
+          </InputClaims>
+          <OutputClaims>
+            <!-- Optional claims, to be collected from the user -->
+            <OutputClaim ClaimTypeReferenceId="external_SessionId" PartnerClaimType="SessionId" />
+
+            <OutputClaim ClaimTypeReferenceId="external_Question_1" PartnerClaimType="questionSet[0].questionText" />
+            <OutputClaim ClaimTypeReferenceId="external_Question_1_Answers" PartnerClaimType="questionSet[0].questionSelect" />
+
+            <OutputClaim ClaimTypeReferenceId="external_Question_2" PartnerClaimType="questionSet[1].questionText" />
+            <OutputClaim ClaimTypeReferenceId="external_Question_2_Answers" PartnerClaimType="questionSet[1].questionSelect" />
+
+            <OutputClaim ClaimTypeReferenceId="external_Question_3" PartnerClaimType="questionSet[2].questionText" />
+            <OutputClaim ClaimTypeReferenceId="external_Question_3_Answers" PartnerClaimType="questionSet[2].questionSelect" />
+
+            <OutputClaim ClaimTypeReferenceId="external_Question_4" PartnerClaimType="questionSet[3].questionText" />
+            <OutputClaim ClaimTypeReferenceId="external_Question_4_Answers" PartnerClaimType="questionSet[3].questionSelect" />
+
+            <OutputClaim ClaimTypeReferenceId="external_Question_5" PartnerClaimType="questionSet[4].questionText" />
+            <OutputClaim ClaimTypeReferenceId="external_Question_5_Answers" PartnerClaimType="questionSet[4].questionSelect" />
+          </OutputClaims>
+        </TechnicalProfile>
+
+        <TechnicalProfile Id="RestApi-UserValidation-SubmitAnswer">
+          <DisplayName>DFP Create Account</DisplayName>
+          <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.RestfulProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+          <Metadata>
+            <Item Key="ServiceUrl">{Settings:IntermediateAppUrl}/api/UserValidation/Answer</Item>
+            <Item Key="AuthenticationType">Bearer</Item>
+            <Item Key="SendClaimsIn">Body</Item>
+            <Item Key="AllowInsecureAuthInProduction">True</Item>
+            <Item Key="IncludeClaimResolvingInClaimsHandling">true</Item>
+            <Item Key="UseClaimAsBearerToken">bearerToken</Item>
+            <Item Key="ResolveJsonPathsInJsonTokens">true</Item>
+          </Metadata>
+          <InputClaims>
+            <InputClaim ClaimTypeReferenceId="bearerToken" />
+
+            <InputClaim ClaimTypeReferenceId="external_SessionId" PartnerClaimType="sessionId"/>
+            <InputClaim ClaimTypeReferenceId="external_ProfileId" PartnerClaimType="profileId" DefaultValue="0" />
+            <InputClaim ClaimTypeReferenceId="external_SelectedAnswers" PartnerClaimType="answerIndex"/>            
+          </InputClaims>
+          <OutputClaims>
+            <OutputClaim ClaimTypeReferenceId="external_IsIdentityVerified" PartnerClaimType="isIdentityVerified"/>
+          </OutputClaims>
+          <OutputClaimsTransformations>
+            <OutputClaimsTransformation ReferenceId="AssertIdentityVerifiedIsTrue"/>
+          </OutputClaimsTransformations>
+        </TechnicalProfile>
+
       </TechnicalProfiles>
     </ClaimsProvider>
 
@@ -1463,6 +1816,29 @@
           <OutputClaimsTransformations>
             <OutputClaimsTransformation ReferenceId="DoesMyChartIdExist" />
             <OutputClaimsTransformation ReferenceId="AssertMyChartIdExistIsFalse" />
+          </OutputClaimsTransformations>
+          <UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop" />
+        </TechnicalProfile>
+
+        <TechnicalProfile Id="GenerateAnwersIndexCSV">
+          <DisplayName>Validate User Chart Id</DisplayName>
+          <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.ClaimsTransformationProtocolProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+          <InputClaims>
+            <InputClaim ClaimTypeReferenceId="external_Question_1_Answers_Selected" />
+            <InputClaim ClaimTypeReferenceId="external_Question_2_Answers_Selected" />
+            <InputClaim ClaimTypeReferenceId="external_Question_3_Answers_Selected" />
+            <InputClaim ClaimTypeReferenceId="external_Question_4_Answers_Selected" />
+            <InputClaim ClaimTypeReferenceId="external_Question_5_Answers_Selected" />
+          </InputClaims>
+          <OutputClaims>
+            <OutputClaim ClaimTypeReferenceId="external_SelectedAnswers"/>
+          </OutputClaims>
+          <OutputClaimsTransformations>
+            <OutputClaimsTransformation ReferenceId="AddAnswerOneIndexToCsv" />
+            <OutputClaimsTransformation ReferenceId="AddAnswerTwoIndexToCsv" />
+            <OutputClaimsTransformation ReferenceId="AddAnswerThreeIndexToCsv" />
+            <OutputClaimsTransformation ReferenceId="AddAnswerFourIndexToCsv" />
+            <OutputClaimsTransformation ReferenceId="AddAnswerFiveIndexToCsv" />
           </OutputClaimsTransformations>
           <UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop" />
         </TechnicalProfile>
@@ -2593,6 +2969,110 @@
           <UseTechnicalProfileForSessionManagement ReferenceId="SM-AAD" />
         </TechnicalProfile>
 
+        <TechnicalProfile Id="SelfAsserted-CollectDemoGraphics">
+          <DisplayName>Show Demographics</DisplayName>
+          <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.SelfAssertedAttributeProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+          <Metadata>
+            <Item Key="IpAddressClaimReferenceId">IpAddress</Item>
+            <Item Key="ContentDefinitionReferenceId">api.selfasserted</Item>            
+          </Metadata>
+          <CryptographicKeys>
+            <Key Id="issuer_secret" StorageReferenceId="B2C_1A_TokenSigningKeyContainer" />
+          </CryptographicKeys>
+          <OutputClaims>
+            <OutputClaim ClaimTypeReferenceId="external_FirstName" Required="true" /> 
+            <OutputClaim ClaimTypeReferenceId="external_MiddleName" /> 
+            <OutputClaim ClaimTypeReferenceId="external_LastName"/>
+            <OutputClaim ClaimTypeReferenceId="external_DateOfBirth" Required="true" /> 
+            <OutputClaim ClaimTypeReferenceId="external_Gender" Required="true" /> 
+            <OutputClaim ClaimTypeReferenceId="external_Street" /> 
+            <OutputClaim ClaimTypeReferenceId="external_Street2" /> 
+            <OutputClaim ClaimTypeReferenceId="external_Phone" /> 
+            <OutputClaim ClaimTypeReferenceId="external_City" /> 
+            <OutputClaim ClaimTypeReferenceId="external_State" /> 
+            <OutputClaim ClaimTypeReferenceId="external_Zip" />
+
+            <OutputClaim ClaimTypeReferenceId="external_SessionId" />
+
+            <OutputClaim ClaimTypeReferenceId="external_Question_1" />
+            <OutputClaim ClaimTypeReferenceId="external_Question_1_Answers" />
+
+            <OutputClaim ClaimTypeReferenceId="external_Question_2" />
+            <OutputClaim ClaimTypeReferenceId="external_Question_2_Answers" />
+
+            <OutputClaim ClaimTypeReferenceId="external_Question_3" />
+            <OutputClaim ClaimTypeReferenceId="external_Question_3_Answers" />
+
+            <OutputClaim ClaimTypeReferenceId="external_Question_4" />
+            <OutputClaim ClaimTypeReferenceId="external_Question_4_Answers" />
+
+            <OutputClaim ClaimTypeReferenceId="external_Question_5" />
+            <OutputClaim ClaimTypeReferenceId="external_Question_5_Answers" />
+          </OutputClaims>          
+          <ValidationTechnicalProfiles> 
+            <ValidationTechnicalProfile ReferenceId="RestApi-UserValidation-GetQuestions" />
+          </ValidationTechnicalProfiles>  
+          <UseTechnicalProfileForSessionManagement ReferenceId="SM-AAD" />
+        </TechnicalProfile>
+
+        <TechnicalProfile Id="SelfAsserted-CollectQuestionAnswers">
+          <DisplayName>Show Demographics</DisplayName>
+          <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.SelfAssertedAttributeProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+          <Metadata>
+            <Item Key="IpAddressClaimReferenceId">IpAddress</Item>
+            <Item Key="ContentDefinitionReferenceId">api.selfasserted.collectQuestionAnswers</Item>
+            <Item Key="UserMessageIfClaimsTransformationBooleanValueIsNotEqual">Failed to verify your Identity. You can edit your answers and try again.</Item>
+          </Metadata>
+          <CryptographicKeys>
+            <Key Id="issuer_secret" StorageReferenceId="B2C_1A_TokenSigningKeyContainer" />
+          </CryptographicKeys>
+          <InputClaims>
+            <InputClaim ClaimTypeReferenceId="external_SessionId"/>
+
+            <InputClaim ClaimTypeReferenceId="external_Question_1"/>
+            <InputClaim ClaimTypeReferenceId="external_Question_1_Answers"/>
+
+            <InputClaim ClaimTypeReferenceId="external_Question_2"/>
+            <InputClaim ClaimTypeReferenceId="external_Question_2_Answers"/>
+
+            <InputClaim ClaimTypeReferenceId="external_Question_3"/>
+            <InputClaim ClaimTypeReferenceId="external_Question_3_Answers"/>
+
+            <InputClaim ClaimTypeReferenceId="external_Question_4"/>
+            <InputClaim ClaimTypeReferenceId="external_Question_4_Answers"/>
+
+            <InputClaim ClaimTypeReferenceId="external_Question_5"/>
+            <InputClaim ClaimTypeReferenceId="external_Question_5_Answers"/>
+          </InputClaims>
+          <OutputClaims>
+
+            <OutputClaim ClaimTypeReferenceId="external_Question_1"/> 
+            <OutputClaim ClaimTypeReferenceId="external_Question_1_Answers"/> 
+            <OutputClaim ClaimTypeReferenceId="external_Question_1_Answers_Selected" Required="true"/> 
+
+            <OutputClaim ClaimTypeReferenceId="external_Question_2"/> 
+            <OutputClaim ClaimTypeReferenceId="external_Question_2_Answers"/> 
+            <OutputClaim ClaimTypeReferenceId="external_Question_2_Answers_Selected" Required="true"/> 
+
+            <OutputClaim ClaimTypeReferenceId="external_Question_3"/> 
+            <OutputClaim ClaimTypeReferenceId="external_Question_3_Answers"/> 
+            <OutputClaim ClaimTypeReferenceId="external_Question_3_Answers_Selected" Required="true"/> 
+
+            <OutputClaim ClaimTypeReferenceId="external_Question_4"/> 
+            <OutputClaim ClaimTypeReferenceId="external_Question_4_Answers"/>
+            <OutputClaim ClaimTypeReferenceId="external_Question_4_Answers_Selected" Required="true"/> 
+
+            <OutputClaim ClaimTypeReferenceId="external_Question_5"/> 
+            <OutputClaim ClaimTypeReferenceId="external_Question_5_Answers"/>  
+            <OutputClaim ClaimTypeReferenceId="external_Question_5_Answers_Selected" Required="true"/> 
+          </OutputClaims>          
+          <ValidationTechnicalProfiles> 
+            <ValidationTechnicalProfile ReferenceId="GenerateAnwersIndexCSV" />          
+            <ValidationTechnicalProfile ReferenceId="RestApi-UserValidation-SubmitAnswer" />
+          </ValidationTechnicalProfiles>  
+          <UseTechnicalProfileForSessionManagement ReferenceId="SM-AAD" />
+        </TechnicalProfile>
+
         <TechnicalProfile Id="LocalAccountDiscoveryUsingEmailAddress">
           <OutputClaims>
             <OutputClaim ClaimTypeReferenceId="isActiveEmailSession"  DefaultValue="true" AlwaysUseDefaultValue="true"/>
@@ -3540,6 +4020,35 @@
       </OrchestrationSteps>
     </SubJourney>
 
+    <SubJourney Id="VerifyUserExternal" Type="Call">
+      <OrchestrationSteps>
+
+        <OrchestrationStep Order="1" Type="ClaimsExchange">
+          <Preconditions>
+            <Precondition Type="ClaimsExist" ExecuteActionsIf="true">
+              <Value>bearerToken</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
+          </Preconditions>
+          <ClaimsExchanges>
+            <ClaimsExchange Id="AcquireAccessToken" TechnicalProfileReferenceId="REST-AcquireAccessToken" />
+          </ClaimsExchanges>
+        </OrchestrationStep>
+
+        <OrchestrationStep Order="2" Type="ClaimsExchange">
+          <ClaimsExchanges>
+            <ClaimsExchange Id="SelfAsserted-CollectDemoGraphicsExchange" TechnicalProfileReferenceId="SelfAsserted-CollectDemoGraphics" />
+          </ClaimsExchanges>
+        </OrchestrationStep>
+
+        <OrchestrationStep Order="3" Type="ClaimsExchange">
+          <ClaimsExchanges>
+            <ClaimsExchange Id="SelfAsserted-CollectQuestionAnswersExchange" TechnicalProfileReferenceId="SelfAsserted-CollectQuestionAnswers" />
+          </ClaimsExchanges>
+        </OrchestrationStep>
+      </OrchestrationSteps>
+    </SubJourney>
+
     <SubJourney Id="MyChartIdAccountLinking" Type="Call">
       <OrchestrationSteps>
 
@@ -3551,7 +4060,7 @@
 
         <OrchestrationStep Order="2" Type="ClaimsExchange">
           <Preconditions>
-            <Precondition Type="ClaimsExist" ExecuteActionsIf="true">
+            <Precondition Type="ClaimsExist" ExecuteActionsIf="false">
               <Value>myChartIdLinkingSelectedOption</Value>
               <Action>SkipThisOrchestrationStep</Action>
             </Precondition>
@@ -3568,7 +4077,7 @@
 
         <OrchestrationStep Order="3" Type="ClaimsExchange">
           <Preconditions>
-            <Precondition Type="ClaimsExist" ExecuteActionsIf="true">
+            <Precondition Type="ClaimsExist" ExecuteActionsIf="false">
               <Value>myChartIdLinkingSelectedOption</Value>
               <Action>SkipThisOrchestrationStep</Action>
             </Precondition>
@@ -3603,6 +4112,23 @@
         <!-- Link MyChartId to the B2C account here -->
 
         <!-- Code for experian flow if the selected option is experian -->
+
+        <OrchestrationStep Order="4" Type="InvokeSubJourney">
+          <Preconditions>
+            <Precondition Type="ClaimsExist" ExecuteActionsIf="false">
+              <Value>myChartIdLinkingSelectedOption</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
+            <Precondition Type="ClaimEquals" ExecuteActionsIf="false">
+              <Value>myChartIdLinkingSelectedOption</Value>
+              <Value>experian</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
+          </Preconditions>
+          <JourneyList>
+            <Candidate SubJourneyReferenceId="VerifyUserExternal" />
+          </JourneyList>
+        </OrchestrationStep>
       </OrchestrationSteps>
     </SubJourney>
 
