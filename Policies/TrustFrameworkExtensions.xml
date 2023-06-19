@@ -526,8 +526,8 @@
         <UserInputType>TextBox</UserInputType>
       </ClaimType>
 
-      <ClaimType Id="myChartIdTemp">
-        <DisplayName>User's myChartId</DisplayName>
+      <ClaimType Id="myChartIdFromApi">
+        <DisplayName>User's myChartId recieved from API</DisplayName>
         <DataType>string</DataType>        
         <UserInputType>TextBox</UserInputType>
       </ClaimType>
@@ -1348,17 +1348,7 @@
       </ClaimsTransformation>
 
     </ClaimsTransformations>
-    
-    <ContentDefinitions>
-      <ContentDefinition Id="api.selfasserted.collectQuestionAnswers">
-        <LoadUri>{Settings:UIBaseUrl}collectQuestionAnswer.html?ver={Settings:Build.BuildNumber}</LoadUri>
-        <RecoveryUri>~/common/default_page_error.html</RecoveryUri>
-        <DataUri>urn:com:microsoft:aad:b2c:elements:contract:selfasserted:2.1.7</DataUri>
-        <Metadata>
-          <Item Key="DisplayName">Collect information from user page</Item>
-        </Metadata>
-      </ContentDefinition>
-    </ContentDefinitions>  
+
     <DisplayControls>
       <DisplayControl Id="emailVerificationControl-Verify" UserInterfaceControlType="VerificationControl">
         <InputClaims>
@@ -1840,6 +1830,18 @@
             <OutputClaimsTransformation ReferenceId="AddAnswerFourIndexToCsv" />
             <OutputClaimsTransformation ReferenceId="AddAnswerFiveIndexToCsv" />
           </OutputClaimsTransformations>
+          <UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop" />
+        </TechnicalProfile>
+
+        <TechnicalProfile Id="SetExperianAsVerificationMethod">
+          <DisplayName>Validate User Chart Id</DisplayName>
+          <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.ClaimsTransformationProtocolProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+          <InputClaims>
+            <InputClaim ClaimTypeReferenceId="myChartIdLinkingSelectedOption" DefaultValue="experian" AlwaysUseDefaultValue="true" />
+          </InputClaims>
+          <OutputClaims>
+            <OutputClaim ClaimTypeReferenceId="myChartIdLinkingSelectedOption"/>
+          </OutputClaims>
           <UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop" />
         </TechnicalProfile>
 
@@ -2774,12 +2776,12 @@
           <UseTechnicalProfileForSessionManagement ReferenceId="SM-AAD" />
         </TechnicalProfile>
 
-        <TechnicalProfile Id="LocalAccountSignUpWithLogonEmail-WithActivationCode-CollectCode">
+        <TechnicalProfile Id="VerifyUser-WithActivationCode-CollectCode">
           <DisplayName>Email signup</DisplayName>
           <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.SelfAssertedAttributeProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
           <Metadata>
             <Item Key="IpAddressClaimReferenceId">IpAddress</Item>
-            <Item Key="ContentDefinitionReferenceId">api.localaccountsignup</Item>
+            <Item Key="ContentDefinitionReferenceId">api.selfasserted.verifyuser.activationcode</Item>
           </Metadata>
           <CryptographicKeys>
             <Key Id="issuer_secret" StorageReferenceId="B2C_1A_TokenSigningKeyContainer" />
@@ -2795,18 +2797,53 @@
           <UseTechnicalProfileForSessionManagement ReferenceId="SM-AAD" />
         </TechnicalProfile>
 
-        <TechnicalProfile Id="LocalAccountSignUpWithLogonEmail-WithActivationCode-ShowDemographics">
-          <DisplayName>Show Demographics</DisplayName>
+        <TechnicalProfile Id="VerifyUser-WithActivationCode-CollectCode-WithExperianLink">
+          <DisplayName>Email signup</DisplayName>
           <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.SelfAssertedAttributeProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
           <Metadata>
             <Item Key="IpAddressClaimReferenceId">IpAddress</Item>
-            <Item Key="ContentDefinitionReferenceId">api.localaccountsignup</Item>
+            <Item Key="ContentDefinitionReferenceId">api.selfasserted.verifyuser.activationcode.withlink</Item>
           </Metadata>
           <CryptographicKeys>
             <Key Id="issuer_secret" StorageReferenceId="B2C_1A_TokenSigningKeyContainer" />
           </CryptographicKeys>
           <OutputClaims>
-            <OutputClaim ClaimTypeReferenceId="myChartIdTemp" Required="true" /> 
+            <OutputClaim ClaimTypeReferenceId="dateOfBirth" />
+            <OutputClaim ClaimTypeReferenceId="activationCode" />
+            <OutputClaim ClaimTypeReferenceId="myChartIdLinkingSelectedOption"/>
+          </OutputClaims>
+          <!-- Placeholder for the external API call -  dob and activation code.  -->
+          <!-- <ValidationTechnicalProfiles>
+            <ValidationTechnicalProfile ReferenceId="ApiCall-TBD" />
+              <Preconditions>
+                <Precondition Type="ClaimEquals" ExecuteActionsIf="true">
+                  <Value>myChartIdLinkingSelectedOption</Value>
+                  <Value>experian</Value>
+                  <Action>SkipThisValidationTechnicalProfile</Action>
+                </Precondition>
+              </Preconditions>
+            </ValidationTechnicalProfile>            
+          </ValidationTechnicalProfiles>   -->
+          <UseTechnicalProfileForSessionManagement ReferenceId="SM-AAD" />
+        </TechnicalProfile>
+
+        <TechnicalProfile Id="VerifyUser-WithActivationCode-ShowDemographics">
+          <DisplayName>Show Demographics</DisplayName>
+          <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.SelfAssertedAttributeProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+          <Metadata>
+            <Item Key="IpAddressClaimReferenceId">IpAddress</Item>
+            <Item Key="ContentDefinitionReferenceId">api.selfasserted</Item>
+          </Metadata>
+          <CryptographicKeys>
+            <Key Id="issuer_secret" StorageReferenceId="B2C_1A_TokenSigningKeyContainer" />
+          </CryptographicKeys>
+          <InputClaims>
+            <!-- This needs to be removed once the API to verify demographics is ready.
+            Expecting the myChartId as an output claim from verification API -->
+            <InputClaim ClaimTypeReferenceId="myChartIdFromApi" DefaultValue="123"/>
+          </InputClaims>
+          <OutputClaims>
+            <OutputClaim ClaimTypeReferenceId="myChartIdFromApi" Required="true"/> 
           </OutputClaims>
           <!-- Placeholder for the external API call - Verify demographics -->
           <!-- <ValidationTechnicalProfiles> 
@@ -2828,7 +2865,7 @@
           </CryptographicKeys>
           <InputClaims>
             <InputClaim ClaimTypeReferenceId="email" />
-            <InputClaim ClaimTypeReferenceId="myChartIdTemp" />
+            <InputClaim ClaimTypeReferenceId="myChartIdFromApi" />
             <InputClaim ClaimTypeReferenceId="userMessage" DefaultValue="Please fill out your password and information to continue creating your account." AlwaysUseDefaultValue="true"/>
           </InputClaims>
           <DisplayClaims>            
@@ -2884,21 +2921,34 @@
             <!-- Check if the user already exists. If yes, retrieve the chart id. -->
             <ValidationTechnicalProfile ReferenceId="AAD-UserReadChartIdDetailsUsingEmailAddress-NoError" />
 
-            <ValidationTechnicalProfile ReferenceId="ValidateUserChartId">
-              <Preconditions>
+            <ValidationTechnicalProfile ReferenceId="ValidateUserChartId"/>
+              <!-- <Preconditions>
                 <Precondition Type="ClaimsExist" ExecuteActionsIf="false">
                   <Value>temp_objectId</Value>
                   <Action>SkipThisValidationTechnicalProfile</Action>
                 </Precondition>
               </Preconditions>
-            </ValidationTechnicalProfile>
+            </ValidationTechnicalProfile> -->
 
             <ValidationTechnicalProfile ReferenceId="REST-AcquireAccessToken" />
-
-            <ValidationTechnicalProfile ReferenceId="RestApi-DFP-CreateAccount" />
+            <!-- Q: Need to call DFP Sign up if the user already exists and chart id not linked? -->
+            <ValidationTechnicalProfile ReferenceId="RestApi-DFP-CreateAccount">
+              <Preconditions>
+                <Precondition Type="ClaimEquals" ExecuteActionsIf="false">
+                  <Value>isMyChartIdExist</Value>
+                  <Value>False</Value>
+                  <Action>SkipThisValidationTechnicalProfile</Action>
+                </Precondition>
+              </Preconditions>
+            </ValidationTechnicalProfile>
 
             <ValidationTechnicalProfile ReferenceId="RestApi-DFP-CreateAccountStatus-Rejected">
               <Preconditions>
+                <Precondition Type="ClaimEquals" ExecuteActionsIf="false">
+                  <Value>isMyChartIdExist</Value>
+                  <Value>False</Value>
+                  <Action>SkipThisValidationTechnicalProfile</Action>
+                </Precondition>
                 <Precondition Type="ClaimsExist" ExecuteActionsIf="false">
                   <Value>dfp_merchantRuleDecision</Value>
                   <Action>SkipThisValidationTechnicalProfile</Action>
@@ -2917,6 +2967,11 @@
 
             <ValidationTechnicalProfile ReferenceId="AAD-UserWriteUsingLogonEmail-WithChartId-Custom">
               <Preconditions>
+                <Precondition Type="ClaimEquals" ExecuteActionsIf="false">
+                  <Value>isMyChartIdExist</Value>
+                  <Value>False</Value>
+                  <Action>SkipThisValidationTechnicalProfile</Action>
+                </Precondition>
                 <Precondition Type="ClaimsExist" ExecuteActionsIf="false">
                   <Value>dfp_merchantRuleDecision</Value>
                   <Action>SkipThisValidationTechnicalProfile</Action>
@@ -2935,6 +2990,11 @@
 
             <ValidationTechnicalProfile ReferenceId="AAD-UserWriteLinkChartIdToUserUsingEmailAddress">
               <Preconditions>
+                <Precondition Type="ClaimEquals" ExecuteActionsIf="false">
+                  <Value>isMyChartIdExist</Value>
+                  <Value>False</Value>
+                  <Action>SkipThisValidationTechnicalProfile</Action>
+                </Precondition>
                 <Precondition Type="ClaimsExist" ExecuteActionsIf="false">
                   <Value>dfp_merchantRuleDecision</Value>
                   <Action>SkipThisValidationTechnicalProfile</Action>
@@ -2953,6 +3013,11 @@
 
             <ValidationTechnicalProfile ReferenceId="RestApi-DFP-CreateAccountStatus-Approved">
               <Preconditions>
+                <Precondition Type="ClaimEquals" ExecuteActionsIf="false">
+                  <Value>isMyChartIdExist</Value>
+                  <Value>False</Value>
+                  <Action>SkipThisValidationTechnicalProfile</Action>
+                </Precondition>
                 <Precondition Type="ClaimsExist" ExecuteActionsIf="false">
                   <Value>dfp_merchantRuleDecision</Value>
                   <Action>SkipThisValidationTechnicalProfile</Action>
@@ -3043,6 +3108,10 @@
 
             <InputClaim ClaimTypeReferenceId="external_Question_5"/>
             <InputClaim ClaimTypeReferenceId="external_Question_5_Answers"/>
+
+            <!-- This needs to be removed once the API to verify demographics is ready.
+            Expecting the myChartId as an output claim from verification API -->
+            <InputClaim ClaimTypeReferenceId="myChartIdFromApi" DefaultValue="123"/>
           </InputClaims>
           <OutputClaims>
 
@@ -3065,6 +3134,8 @@
             <OutputClaim ClaimTypeReferenceId="external_Question_5"/> 
             <OutputClaim ClaimTypeReferenceId="external_Question_5_Answers"/>  
             <OutputClaim ClaimTypeReferenceId="external_Question_5_Answers_Selected" Required="true"/> 
+
+            <OutputClaim ClaimTypeReferenceId="myChartIdFromApi" Required="true"/> 
           </OutputClaims>          
           <ValidationTechnicalProfiles> 
             <ValidationTechnicalProfile ReferenceId="GenerateAnwersIndexCSV" />          
@@ -3276,7 +3347,7 @@
           <UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop" />
         </TechnicalProfile>
 
-        <TechnicalProfile Id="SelfAsserted-MyChartIdAccountLinking-OptExperianVsActivationCode">
+        <TechnicalProfile Id="SelfAsserted-AccountLinking-MyChartId-OptExperianVsActivationCode">
           <DisplayName>Opt experian vs activation code for account linking</DisplayName>
           <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.SelfAssertedAttributeProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
           <Metadata>
@@ -3381,7 +3452,7 @@
 
         <TechnicalProfile Id="AAD-UserWriteUsingLogonEmail-WithChartId-Custom">
           <PersistedClaims>
-            <PersistedClaim ClaimTypeReferenceId="myChartIdTemp" PartnerClaimType="extension_myChartId" />
+            <PersistedClaim ClaimTypeReferenceId="myChartIdFromApi" PartnerClaimType="extension_myChartId" />
           </PersistedClaims>  
           <IncludeTechnicalProfile ReferenceId="AAD-UserWriteUsingLogonEmail-Custom"/>
         </TechnicalProfile>
@@ -3435,10 +3506,10 @@
           </InputClaims>
           <PersistedClaims>
             <PersistedClaim ClaimTypeReferenceId="email" PartnerClaimType="signInNames.emailAddress" />
-            <PersistedClaim ClaimTypeReferenceId="myChartIdTemp" PartnerClaimType="extension_myChartId" />
+            <PersistedClaim ClaimTypeReferenceId="myChartIdFromApi" PartnerClaimType="extension_myChartId" />
           </PersistedClaims>
           <OutputClaims>
-            <OutputClaim ClaimTypeReferenceId="myChartIdTemp" PartnerClaimType="extension_myChartId" />
+            <OutputClaim ClaimTypeReferenceId="myChartIdFromApi" PartnerClaimType="extension_myChartId" />
             <OutputClaim ClaimTypeReferenceId="newUser" PartnerClaimType="newClaimsPrincipalCreated" />
             <OutputClaim ClaimTypeReferenceId="authenticationSource" DefaultValue="localAccountAuthentication" />
             <OutputClaim ClaimTypeReferenceId="userPrincipalName" />
@@ -3446,6 +3517,24 @@
             <OutputClaim ClaimTypeReferenceId="displayName" />
             <OutputClaim ClaimTypeReferenceId="objectId" />
           </OutputClaims>
+          <IncludeTechnicalProfile ReferenceId="AAD-Common" />
+        </TechnicalProfile>
+
+        <TechnicalProfile Id="AAD-UserWriteLinkChartIdToUserUsingObjectId">
+          <Metadata>
+            <Item Key="Operation">Write</Item>
+            <Item Key="RaiseErrorIfClaimsPrincipalAlreadyExists">false</Item>
+            <Item Key="RaiseErrorIfClaimsPrincipalDoesNotExist">true</Item>
+          </Metadata>
+          <IncludeInSso>false</IncludeInSso>
+          <InputClaims>
+            <InputClaim ClaimTypeReferenceId="objectId" Required="true" />
+          </InputClaims>
+          <PersistedClaims>
+            <!-- Required claims -->
+            <PersistedClaim ClaimTypeReferenceId="objectId" /> 
+            <PersistedClaim ClaimTypeReferenceId="myChartIdFromApi" PartnerClaimType="extension_myChartId" />
+          </PersistedClaims>
           <IncludeTechnicalProfile ReferenceId="AAD-Common" />
         </TechnicalProfile>
 
@@ -3703,7 +3792,7 @@
             </Precondition>
           </Preconditions>
           <JourneyList>
-            <Candidate SubJourneyReferenceId="MyChartIdAccountLinking" />
+            <Candidate SubJourneyReferenceId="AccountLinking-MyChartId" />
           </JourneyList>
         </OrchestrationStep>
 
@@ -4000,27 +4089,77 @@
 
     <SubJourney Id="SignUp-WithActivationCode-DFP" Type="Call">
       <OrchestrationSteps>
-        <OrchestrationStep Order="1" Type="ClaimsExchange">
-          <ClaimsExchanges>
-            <ClaimsExchange Id="SignUpWithLogonEmail-WithActivationCode-CollectExchange" TechnicalProfileReferenceId="LocalAccountSignUpWithLogonEmail-WithActivationCode-CollectCode" />
-          </ClaimsExchanges>
+
+        <OrchestrationStep Order="1" Type="InvokeSubJourney">
+          <JourneyList>
+            <Candidate SubJourneyReferenceId="VerifyUser-ActivationCode" />
+          </JourneyList>
         </OrchestrationStep>
 
         <OrchestrationStep Order="2" Type="ClaimsExchange">
           <ClaimsExchanges>
-            <ClaimsExchange Id="SignUpWithLogonEmail-WithActivationCode-DemographicsExchange" TechnicalProfileReferenceId="LocalAccountSignUpWithLogonEmail-WithActivationCode-ShowDemographics" />
+            <ClaimsExchange Id="SignUpWithLogonEmail-WithActivationCodeExchange" TechnicalProfileReferenceId="LocalAccountSignUpWithLogonEmail-WithActivationCode-RegisterUser" />
+          </ClaimsExchanges>
+        </OrchestrationStep>
+
+      </OrchestrationSteps>
+    </SubJourney>
+
+    <SubJourney Id="VerifyUser-ActivationCode" Type="Call">
+      <OrchestrationSteps>
+
+      <OrchestrationStep Order="1" Type="ClaimsExchange">
+          <Preconditions>
+            <Precondition Type="ClaimsExist" ExecuteActionsIf="true">
+              <Value>bearerToken</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
+          </Preconditions>
+          <ClaimsExchanges>
+            <ClaimsExchange Id="AcquireAccessToken" TechnicalProfileReferenceId="REST-AcquireAccessToken" />
+          </ClaimsExchanges>
+        </OrchestrationStep>
+
+        <OrchestrationStep Order="2" Type="ClaimsExchange">
+          <Preconditions> 
+            <Precondition Type="ClaimsExist" ExecuteActionsIf="true">
+              <Value>objectId</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
+          </Preconditions>
+          <ClaimsExchanges>
+            <ClaimsExchange Id="VerifyUser-CollectCodeExchange" TechnicalProfileReferenceId="VerifyUser-WithActivationCode-CollectCode" />
           </ClaimsExchanges>
         </OrchestrationStep>
 
         <OrchestrationStep Order="3" Type="ClaimsExchange">
+          <Preconditions>
+            <Precondition Type="ClaimsExist" ExecuteActionsIf="false">
+              <Value>objectId</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
+          </Preconditions>
           <ClaimsExchanges>
-            <ClaimsExchange Id="SignUpWithLogonEmail-WithActivationCodeExchange" TechnicalProfileReferenceId="LocalAccountSignUpWithLogonEmail-WithActivationCode-RegisterUser" />
+            <ClaimsExchange Id="VerifyUser-CollectCode-WithExperianLinkExchange" TechnicalProfileReferenceId="VerifyUser-WithActivationCode-CollectCode-WithExperianLink" />
+          </ClaimsExchanges>
+        </OrchestrationStep>
+
+        <OrchestrationStep Order="4" Type="ClaimsExchange">
+          <Preconditions>
+            <Precondition Type="ClaimEquals" ExecuteActionsIf="true">
+              <Value>myChartIdLinkingSelectedOption</Value>
+              <Value>experian</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
+          </Preconditions>
+          <ClaimsExchanges>
+            <ClaimsExchange Id="VerifyUser-ShowDemographicsExchange" TechnicalProfileReferenceId="VerifyUser-WithActivationCode-ShowDemographics" />
           </ClaimsExchanges>
         </OrchestrationStep>
       </OrchestrationSteps>
     </SubJourney>
 
-    <SubJourney Id="VerifyUserExternal" Type="Call">
+    <SubJourney Id="VerifyUser-Experian" Type="Call">
       <OrchestrationSteps>
 
         <OrchestrationStep Order="1" Type="ClaimsExchange">
@@ -4049,16 +4188,18 @@
       </OrchestrationSteps>
     </SubJourney>
 
-    <SubJourney Id="MyChartIdAccountLinking" Type="Call">
+    <SubJourney Id="AccountLinking-MyChartId" Type="Call">
       <OrchestrationSteps>
 
         <OrchestrationStep Order="1" Type="ClaimsExchange">
           <ClaimsExchanges>
-            <ClaimsExchange Id="SelfAsserted-MyChartIdAccountLinking-OptOptionExchange" TechnicalProfileReferenceId="SelfAsserted-MyChartIdAccountLinking-OptExperianVsActivationCode" />
+            <ClaimsExchange Id="SelfAsserted-AccountLinking-MyChartId-OptOptionExchange" TechnicalProfileReferenceId="SelfAsserted-AccountLinking-MyChartId-OptExperianVsActivationCode" />
           </ClaimsExchanges>
         </OrchestrationStep>
 
-        <OrchestrationStep Order="2" Type="ClaimsExchange">
+        <!-- if the selected option is activation code -->
+
+        <OrchestrationStep Order="2" Type="InvokeSubJourney">
           <Preconditions>
             <Precondition Type="ClaimsExist" ExecuteActionsIf="false">
               <Value>myChartIdLinkingSelectedOption</Value>
@@ -4070,50 +4211,14 @@
               <Action>SkipThisOrchestrationStep</Action>
             </Precondition>
           </Preconditions>
-          <ClaimsExchanges>
-            <ClaimsExchange Id="MyChartId-WithActivationCode-CollectExchange" TechnicalProfileReferenceId="LocalAccountSignUpWithLogonEmail-WithActivationCode-CollectCode" />
-          </ClaimsExchanges>
+          <JourneyList>
+            <Candidate SubJourneyReferenceId="VerifyUser-ActivationCode" />
+          </JourneyList>
         </OrchestrationStep>
 
-        <OrchestrationStep Order="3" Type="ClaimsExchange">
-          <Preconditions>
-            <Precondition Type="ClaimsExist" ExecuteActionsIf="false">
-              <Value>myChartIdLinkingSelectedOption</Value>
-              <Action>SkipThisOrchestrationStep</Action>
-            </Precondition>
-            <Precondition Type="ClaimEquals" ExecuteActionsIf="false">
-              <Value>myChartIdLinkingSelectedOption</Value>
-              <Value>activation_Code</Value>
-              <Action>SkipThisOrchestrationStep</Action>
-            </Precondition>
-          </Preconditions> 
-          <ClaimsExchanges>
-            <ClaimsExchange Id="MyChartId-WithActivationCode-DemographicsExchange" TechnicalProfileReferenceId="LocalAccountSignUpWithLogonEmail-WithActivationCode-ShowDemographics" />
-          </ClaimsExchanges>
-        </OrchestrationStep>
+        <!--if the selected option is experian -->
 
-        <!-- <OrchestrationStep Order="3" Type="ClaimsExchange">
-          <Preconditions>
-            <Precondition Type="ClaimsExist" ExecuteActionsIf="true">
-              <Value>myChartIdLinkingSelectedOption</Value>
-              <Action>SkipThisOrchestrationStep</Action>
-            </Precondition>
-            <Precondition Type="ClaimEquals" ExecuteActionsIf="false">
-              <Value>myChartIdLinkingSelectedOption</Value>
-              <Value>activation_Code</Value>
-              <Action>SkipThisOrchestrationStep</Action>
-            </Precondition>
-          </Preconditions>
-          <ClaimsExchanges>
-            <ClaimsExchange Id="MyChartId-WithActivationCodeExchange" TechnicalProfileReferenceId="LocalAccountSignUpWithLogonEmail-WithActivationCode-RegisterUser" />
-          </ClaimsExchanges>
-        </OrchestrationStep> -->
-
-        <!-- Link MyChartId to the B2C account here -->
-
-        <!-- Code for experian flow if the selected option is experian -->
-
-        <OrchestrationStep Order="4" Type="InvokeSubJourney">
+        <OrchestrationStep Order="3" Type="InvokeSubJourney">
           <Preconditions>
             <Precondition Type="ClaimsExist" ExecuteActionsIf="false">
               <Value>myChartIdLinkingSelectedOption</Value>
@@ -4126,9 +4231,16 @@
             </Precondition>
           </Preconditions>
           <JourneyList>
-            <Candidate SubJourneyReferenceId="VerifyUserExternal" />
+            <Candidate SubJourneyReferenceId="VerifyUser-Experian" />
           </JourneyList>
+        </OrchestrationStep>        
+
+        <OrchestrationStep Order="4" Type="ClaimsExchange">
+          <ClaimsExchanges>
+            <ClaimsExchange Id="UserWriteLinkChartIdToUserUsingObjectIdExchange" TechnicalProfileReferenceId="AAD-UserWriteLinkChartIdToUserUsingObjectId" />
+          </ClaimsExchanges>
         </OrchestrationStep>
+
       </OrchestrationSteps>
     </SubJourney>
 

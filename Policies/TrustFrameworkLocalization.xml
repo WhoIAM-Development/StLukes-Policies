@@ -177,6 +177,33 @@
         </Metadata>
       </ContentDefinition>
 
+      <ContentDefinition Id="api.selfasserted.collectQuestionAnswers">
+        <LoadUri>{Settings:UIBaseUrl}collectQuestionAnswer.html?ver={Settings:Build.BuildNumber}</LoadUri>
+        <RecoveryUri>~/common/default_page_error.html</RecoveryUri>
+        <DataUri>urn:com:microsoft:aad:b2c:elements:contract:selfasserted:2.1.7</DataUri>
+        <Metadata>
+          <Item Key="DisplayName">Collect information from user page</Item>
+        </Metadata>
+      </ContentDefinition>
+      
+      <ContentDefinition Id="api.selfasserted.verifyuser.activationcode">
+        <LoadUri>{Settings:UIBaseUrl}selfAsserted.html?ver={Settings:Build.BuildNumber}</LoadUri>
+        <RecoveryUri>~/common/default_page_error.html</RecoveryUri>
+        <DataUri>urn:com:microsoft:aad:b2c:elements:contract:selfasserted:2.1.7</DataUri>
+        <Metadata>
+          <Item Key="DisplayName">Collect information from user page</Item>
+        </Metadata>
+      </ContentDefinition>
+
+      <ContentDefinition Id="api.selfasserted.verifyuser.activationcode.withlink">
+        <LoadUri>{Settings:UIBaseUrl}verifyUserActivationCodeWithLink.html?ver={Settings:Build.BuildNumber}</LoadUri>
+        <RecoveryUri>~/common/default_page_error.html</RecoveryUri>
+        <DataUri>urn:com:microsoft:aad:b2c:elements:contract:selfasserted:2.1.7</DataUri>
+        <Metadata>
+          <Item Key="DisplayName">Collect information from user page</Item>
+        </Metadata>
+      </ContentDefinition>
+
     </ContentDefinitions>
 
     <Localization Enabled="true">
