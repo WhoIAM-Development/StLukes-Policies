@@ -849,6 +849,15 @@
         </OutputClaims>
       </ClaimsTransformation>
 
+      <ClaimsTransformation Id="CreateMessageInvalidVerification" TransformationMethod="CreateStringClaim">
+        <InputParameters>
+          <InputParameter Id="value" DataType="string" Value="Contact support to get an activation code." />
+        </InputParameters>
+        <OutputClaims>
+          <OutputClaim ClaimTypeReferenceId="userMessage" TransformationClaimType="createdClaim" />
+        </OutputClaims>
+      </ClaimsTransformation>
+
       <ClaimsTransformation Id="CreateMessageSignUpSuccessfull-SignInNow" TransformationMethod="CreateStringClaim">
         <InputParameters>
           <InputParameter Id="value" DataType="string" Value="You've created your account, you now need to sign in." />
@@ -1835,12 +1844,9 @@
             <InputClaim ClaimTypeReferenceId="external_SelectedAnswers" PartnerClaimType="answerIndex"/>            
           </InputClaims>
           <OutputClaims>
-            <OutputClaim ClaimTypeReferenceId="external_IsIdentityVerified" PartnerClaimType="isIdentityVerified"/>
+            <OutputClaim ClaimTypeReferenceId="external_IsIdentityVerified" PartnerClaimType="IsIdentityVerified" />
             <OutputClaim ClaimTypeReferenceId="external_MyChartId_ReadOnly" PartnerClaimType="MyChartId"/>
           </OutputClaims>
-          <OutputClaimsTransformations>
-            <OutputClaimsTransformation ReferenceId="AssertIdentityVerifiedIsTrue"/>
-          </OutputClaimsTransformations>
         </TechnicalProfile>
 
         <TechnicalProfile Id="RestApi-UserValidation-GetUserDetails">
@@ -3284,7 +3290,6 @@
           <Metadata>
             <Item Key="IpAddressClaimReferenceId">IpAddress</Item>
             <Item Key="ContentDefinitionReferenceId">api.selfasserted.collectQuestionAnswers</Item>
-            <Item Key="UserMessageIfClaimsTransformationBooleanValueIsNotEqual">Failed to verify your Identity. You can edit your answers and try again.</Item>
           </Metadata>
           <CryptographicKeys>
             <Key Id="issuer_secret" StorageReferenceId="B2C_1A_TokenSigningKeyContainer" />
@@ -3329,8 +3334,8 @@
             <OutputClaim ClaimTypeReferenceId="external_Question_5"/> 
             <OutputClaim ClaimTypeReferenceId="external_Question_5_Answers"/>  
             <OutputClaim ClaimTypeReferenceId="external_Question_5_Answers_Selected" Required="true"/> 
-
-            <OutputClaim ClaimTypeReferenceId="external_MyChartId_ReadOnly"/> 
+            <OutputClaim ClaimTypeReferenceId="external_IsIdentityVerified"/>
+            <OutputClaim ClaimTypeReferenceId="external_MyChartId_ReadOnly"/>
           </OutputClaims>          
           <ValidationTechnicalProfiles> 
             <ValidationTechnicalProfile ReferenceId="GenerateAnwersIndexCSV" />          
@@ -3425,6 +3430,19 @@
           <IncludeInSso>false</IncludeInSso>
           <InputClaimsTransformations>
             <InputClaimsTransformation ReferenceId="CreateMessageSignInRejected" />
+          </InputClaimsTransformations>
+          <IncludeTechnicalProfile ReferenceId="SelfAsserted-ShowMessage"/>
+        </TechnicalProfile>
+
+        <TechnicalProfile Id="SelfAsserted-ShowMessage-SignInRejected-InvalidVerification">
+          <DisplayName>ShowMessage-SignInRejected</DisplayName>
+          <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.SelfAssertedAttributeProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+          <Metadata>
+            <Item Key="UserMessageIfClaimsTransformationBooleanValueIsNotEqual">Contact support to get an activation code.</Item>
+          </Metadata>
+          <IncludeInSso>false</IncludeInSso>
+          <InputClaimsTransformations>
+            <InputClaimsTransformation ReferenceId="CreateMessageInvalidVerification" />
           </InputClaimsTransformations>
           <IncludeTechnicalProfile ReferenceId="SelfAsserted-ShowMessage"/>
         </TechnicalProfile>
@@ -4378,6 +4396,19 @@
         <OrchestrationStep Order="3" Type="ClaimsExchange">
           <ClaimsExchanges>
             <ClaimsExchange Id="SelfAsserted-CollectQuestionAnswersExchange" TechnicalProfileReferenceId="SelfAsserted-CollectQuestionAnswers" />
+          </ClaimsExchanges>
+        </OrchestrationStep>
+
+        <OrchestrationStep Order="4" Type="ClaimsExchange">
+          <Preconditions>
+            <Precondition Type="ClaimEquals" ExecuteActionsIf="true">
+              <Value>external_IsIdentityVerified</Value>
+              <Value>True</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
+          </Preconditions>
+          <ClaimsExchanges>
+            <ClaimsExchange Id="Block-IncorrectAnswers" TechnicalProfileReferenceId="SelfAsserted-ShowMessage-SignInRejected-InvalidVerification" />
           </ClaimsExchanges>
         </OrchestrationStep>
       </OrchestrationSteps>
