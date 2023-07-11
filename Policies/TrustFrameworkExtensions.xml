@@ -537,6 +537,10 @@
         <DataType>boolean</DataType>
       </ClaimType>
 
+      <ClaimType Id="copiedPassword">
+        <DataType>string</DataType>
+      </ClaimType>
+
       <!-- External Api Claims -->
 
       <ClaimType Id="external_MyChartId">
@@ -571,7 +575,7 @@
 
       <ClaimType Id="external_DateOfBirth">
         <DisplayName>Date of birth</DisplayName>
-        <DataType>dateTime</DataType>
+        <DataType>date</DataType>
         <UserHelpText>The date on which you were born.</UserHelpText>
         <UserInputType>DateTimeDropdown</UserInputType>
       </ClaimType>
@@ -581,8 +585,8 @@
         <DataType>string</DataType>
         <UserInputType>RadioSingleSelect</UserInputType>
         <Restriction>
-          <Enumeration Text="Male" Value="male" SelectByDefault="false" />
-          <Enumeration Text="Female" Value="female" SelectByDefault="false" />
+          <Enumeration Text="Male" Value="Male" SelectByDefault="false" />
+          <Enumeration Text="Female" Value="Female" SelectByDefault="false" />
         </Restriction>
       </ClaimType>
 
@@ -2796,7 +2800,7 @@
 
     <ClaimsProvider>
       <DisplayName>Local Account</DisplayName>
-      <TechnicalProfiles>       
+      <TechnicalProfiles>
 
         <TechnicalProfile Id="LocalAccountSignUpWithLogonEmail-WithoutActivationCode-DFP">
           <DisplayName>Email signup</DisplayName>
@@ -2814,6 +2818,7 @@
           </InputClaims>
           <DisplayClaims>            
             <DisplayClaim DisplayControlReferenceId="emailVerificationControl-InputOrVerify" />
+            <DisplayClaim ClaimTypeReferenceId="external_DateOfBirth"/>
             <DisplayClaim ClaimTypeReferenceId="givenName"/>
             <DisplayClaim ClaimTypeReferenceId="surName"/>
             <DisplayClaim ClaimTypeReferenceId="newPassword" Required="true"/>
@@ -2829,9 +2834,10 @@
             <OutputClaim ClaimTypeReferenceId="newUser" />
 
             <!-- Optional claims, to be collected from the user -->
-            <OutputClaim ClaimTypeReferenceId="givenName" />
-            <OutputClaim ClaimTypeReferenceId="surName" />
-
+            <OutputClaim ClaimTypeReferenceId="external_DateOfBirth" Required="true"/>
+            <OutputClaim ClaimTypeReferenceId="givenName" Required="true" />
+            <OutputClaim ClaimTypeReferenceId="surName" Required="true"/>
+          
             <OutputClaim ClaimTypeReferenceId="isActiveEmailSession"  DefaultValue="true" AlwaysUseDefaultValue="true"/>
 
             <OutputClaim ClaimTypeReferenceId="dfp_merchantRuleDecision" />
@@ -2858,7 +2864,6 @@
             <OutputClaim ClaimTypeReferenceId="dfp_UserAgentOperatingSystem"/>
             <OutputClaim ClaimTypeReferenceId="dfp_EmailDomin"/>
             <OutputClaim ClaimTypeReferenceId="dfp_EmailPattern"/>
-
           </OutputClaims>
           <ValidationTechnicalProfiles>
             <ValidationTechnicalProfile ReferenceId="REST-AcquireAccessToken">
@@ -2929,6 +2934,26 @@
             </ValidationTechnicalProfile>
           </ValidationTechnicalProfiles>
           <UseTechnicalProfileForSessionManagement ReferenceId="SM-AAD" />
+        </TechnicalProfile>
+
+        <TechnicalProfile Id="LocalAccount-SelfAssertedFields-WithoutActivationCode">
+          <DisplayName>Sign up Field</DisplayName>
+          <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.SelfAssertedAttributeProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+          <Metadata>
+            <Item Key="IpAddressClaimReferenceId">IpAddress</Item>
+            <Item Key="ContentDefinitionReferenceId">api.localaccountsignup</Item>
+          </Metadata>
+          <CryptographicKeys>
+            <Key Id="issuer_secret" StorageReferenceId="B2C_1A_TokenSigningKeyContainer" />
+          </CryptographicKeys>
+          <OutputClaims>
+            <OutputClaim ClaimTypeReferenceId="external_Street" Required="true"/>
+            <OutputClaim ClaimTypeReferenceId="external_Street2" Required="false"/>
+            <OutputClaim ClaimTypeReferenceId="external_Phone" Required="true"/>
+            <OutputClaim ClaimTypeReferenceId="external_City" Required="true"/>
+            <OutputClaim ClaimTypeReferenceId="external_State" Required="true"/>
+            <OutputClaim ClaimTypeReferenceId="external_Zip" Required="true"/>
+          </OutputClaims>
         </TechnicalProfile>
 
         <TechnicalProfile Id="VerifyUser-WithActivationCode-CollectCode">
@@ -4038,6 +4063,10 @@
               <Action>SkipThisOrchestrationStep</Action>
             </Precondition>
             <Precondition Type="ClaimsExist" ExecuteActionsIf="true">
+              <Value>isSignupFlow</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
+            <Precondition Type="ClaimsExist" ExecuteActionsIf="true">
               <Value>myChartId</Value>
               <Action>SkipThisOrchestrationStep</Action>
             </Precondition>
@@ -4259,8 +4288,28 @@
           </ClaimsExchanges>
         </OrchestrationStep>
 
+        <!-- Execute if the user doesn't have an activation code -->
+        <OrchestrationStep Order="4" Type="ClaimsExchange">
+          <Preconditions>
+            <Precondition Type="ClaimsExist" ExecuteActionsIf="false">
+              <Value>holdsActivationCode</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
+            <Precondition Type="ClaimEquals" ExecuteActionsIf="true">
+              <Value>holdsActivationCode</Value>
+              <Value>True</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
+          </Preconditions>
+          <ClaimsExchanges>
+            <ClaimsExchange Id="SignUp-Fields-WithoutActivationCodeExchange" TechnicalProfileReferenceId="LocalAccount-SelfAssertedFields-WithoutActivationCode" />
+          </ClaimsExchanges>
+        </OrchestrationStep>
+
+        
+
         <!-- Execute if the user does have an activation code -->
-        <OrchestrationStep Order="4" Type="InvokeSubJourney">
+        <OrchestrationStep Order="5" Type="InvokeSubJourney">
           <Preconditions>
             <Precondition Type="ClaimsExist" ExecuteActionsIf="false">
               <Value>holdsActivationCode</Value>
@@ -4278,7 +4327,7 @@
         </OrchestrationStep>
 
         <!-- Track that the sign up step is completed -->
-        <OrchestrationStep Order="5" Type="ClaimsExchange">
+        <OrchestrationStep Order="6" Type="ClaimsExchange">
           <ClaimsExchanges>
             <ClaimsExchange Id="TrackSignUpComplete" TechnicalProfileReferenceId="AzureInsights-SignUpComplete" />
           </ClaimsExchanges>
