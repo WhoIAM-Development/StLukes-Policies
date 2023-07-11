@@ -536,11 +536,7 @@
         <DisplayName>To check MyChartId Exist</DisplayName>
         <DataType>boolean</DataType>
       </ClaimType>
-
-      <ClaimType Id="copiedPassword">
-        <DataType>string</DataType>
-      </ClaimType>
-
+      
       <!-- External Api Claims -->
 
       <ClaimType Id="external_MyChartId">
