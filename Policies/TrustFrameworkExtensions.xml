@@ -571,12 +571,48 @@
 
       <ClaimType Id="external_DateOfBirth">
         <DisplayName>Date of birth</DisplayName>
-        <DataType>date</DataType>
+        <DataType>dateTime</DataType>
         <UserHelpText>The date on which you were born.</UserHelpText>
         <UserInputType>DateTimeDropdown</UserInputType>
       </ClaimType>
 
       <ClaimType Id="external_Gender">
+        <DisplayName>Gender</DisplayName>
+        <DataType>string</DataType>
+        <UserInputType>RadioSingleSelect</UserInputType>
+        <Restriction>
+          <Enumeration Text="Male" Value="Male" SelectByDefault="false" />
+          <Enumeration Text="Female" Value="Female" SelectByDefault="false" />
+        </Restriction>
+      </ClaimType>
+
+      <ClaimType Id="readonly_FirstName">
+        <DisplayName>First Name</DisplayName>
+        <DataType>string</DataType>        
+        <UserInputType>Readonly</UserInputType>
+      </ClaimType>
+
+      <ClaimType Id="readonly_MiddleName">
+        <DisplayName>Middle Name</DisplayName>
+        <DataType>string</DataType>        
+        <UserInputType>Readonly</UserInputType>
+      </ClaimType>
+
+      <ClaimType Id="readonly_LastName">
+        <DisplayName>Last Name</DisplayName>
+        <DataType>string</DataType>        
+        <UserInputType>Readonly</UserInputType>
+      </ClaimType>
+
+      <ClaimType Id="readonly_DateOfBirth">
+        <DisplayName>Date of birth</DisplayName>
+        <DataType>dateTime</DataType>
+        <UserHelpText>The date on which you were born.</UserHelpText>
+        <!-- TODO: you can't copy a Date -->
+        <UserInputType>DateTimeDropdown</UserInputType>
+      </ClaimType>
+
+      <ClaimType Id="readonly_Gender">
         <DisplayName>Gender</DisplayName>
         <DataType>string</DataType>
         <UserInputType>RadioSingleSelect</UserInputType>
@@ -829,6 +865,42 @@
         </InputClaims>
         <OutputClaims>
           <OutputClaim ClaimTypeReferenceId="email.readOnly" TransformationClaimType="outputClaim" />
+        </OutputClaims>
+      </ClaimsTransformation>
+
+      <ClaimsTransformation Id="CopyFirstNameToReadonly" TransformationMethod="CopyClaim">
+        <InputClaims>
+          <InputClaim ClaimTypeReferenceId="external_FirstName" TransformationClaimType="inputClaim" />
+        </InputClaims>
+        <OutputClaims>
+          <OutputClaim ClaimTypeReferenceId="readonly_FirstName" TransformationClaimType="outputClaim" />
+        </OutputClaims>
+      </ClaimsTransformation>
+
+      <ClaimsTransformation Id="CopyMiddleNameToReadonly" TransformationMethod="CopyClaim">
+        <InputClaims>
+          <InputClaim ClaimTypeReferenceId="external_MiddleName" TransformationClaimType="inputClaim" />
+        </InputClaims>
+        <OutputClaims>
+          <OutputClaim ClaimTypeReferenceId="readonly_MiddleName" TransformationClaimType="outputClaim" />
+        </OutputClaims>
+      </ClaimsTransformation>
+
+      <ClaimsTransformation Id="CopyLastNameToReadonly" TransformationMethod="CopyClaim">
+        <InputClaims>
+          <InputClaim ClaimTypeReferenceId="external_LastName" TransformationClaimType="inputClaim" />
+        </InputClaims>
+        <OutputClaims>
+          <OutputClaim ClaimTypeReferenceId="readonly_LastName" TransformationClaimType="outputClaim" />
+        </OutputClaims>
+      </ClaimsTransformation>
+
+      <ClaimsTransformation Id="CopyGenderToReadonly" TransformationMethod="CopyClaim">
+        <InputClaims>
+          <InputClaim ClaimTypeReferenceId="external_Gender" TransformationClaimType="inputClaim" />
+        </InputClaims>
+        <OutputClaims>
+          <OutputClaim ClaimTypeReferenceId="readonly_Gender" TransformationClaimType="outputClaim" />
         </OutputClaims>
       </ClaimsTransformation>
 
@@ -1702,6 +1774,37 @@
             <InputClaim ClaimTypeReferenceId="dfp_ChallengeType" PartnerClaimType="ChallengeType" DefaultValue="None" />
           </InputClaims>
           <IncludeTechnicalProfile ReferenceId="RestApi-DFP-LoginAccountStatus"/>
+        </TechnicalProfile>
+        
+        <TechnicalProfile Id="RestApi-GetUserDetails">
+          <DisplayName>DFP Create Account</DisplayName>
+          <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.RestfulProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+          <Metadata>
+            <Item Key="ServiceUrl">{Settings:IntermediateAppUrl}/api/Adapter/GetUser</Item>
+            <Item Key="AuthenticationType">Bearer</Item>
+            <Item Key="SendClaimsIn">Body</Item>
+            <Item Key="AllowInsecureAuthInProduction">True</Item>
+            <Item Key="IncludeClaimResolvingInClaimsHandling">true</Item>
+            <Item Key="UseClaimAsBearerToken">bearerToken</Item>
+            <Item Key="ResolveJsonPathsInJsonTokens">true</Item>
+          </Metadata>
+          <InputClaims>
+            <InputClaim ClaimTypeReferenceId="bearerToken" />
+            <InputClaim ClaimTypeReferenceId="objectId" PartnerClaimType="objectId"/>
+          </InputClaims>
+          <OutputClaims>
+            <OutputClaim ClaimTypeReferenceId="external_FirstName" PartnerClaimType="FirstName"/>
+            <OutputClaim ClaimTypeReferenceId="external_MiddleName" PartnerClaimType="MiddleName"/>
+            <OutputClaim ClaimTypeReferenceId="external_LastName" PartnerClaimType="LastName"/>
+            <OutputClaim ClaimTypeReferenceId="readonly_DateOfBirth" PartnerClaimType="DateOfBirth"/>
+            <OutputClaim ClaimTypeReferenceId="external_Gender" PartnerClaimType="Gender"/>
+            <OutputClaim ClaimTypeReferenceId="external_Street" PartnerClaimType="Address"/>
+            <!-- TODO: Address Line 2? -->
+            <OutputClaim ClaimTypeReferenceId="external_Phone" PartnerClaimType="PhoneNumber"/>
+            <OutputClaim ClaimTypeReferenceId="external_City" PartnerClaimType="City"/>
+            <OutputClaim ClaimTypeReferenceId="external_State" PartnerClaimType="State"/>
+            <OutputClaim ClaimTypeReferenceId="external_Zip" PartnerClaimType="ZipCode"/>
+          </OutputClaims>
         </TechnicalProfile>
 
         <TechnicalProfile Id="RestApi-UserValidation-GetQuestions">
@@ -3300,17 +3403,41 @@
           <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.SelfAssertedAttributeProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
           <Metadata>
             <Item Key="IpAddressClaimReferenceId">IpAddress</Item>
-            <Item Key="ContentDefinitionReferenceId">api.selfasserted</Item>            
+            <Item Key="ContentDefinitionReferenceId">api.selfasserted.verify</Item>            
           </Metadata>
           <CryptographicKeys>
             <Key Id="issuer_secret" StorageReferenceId="B2C_1A_TokenSigningKeyContainer" />
           </CryptographicKeys>
+          <InputClaimsTransformations>
+            <InputClaimsTransformation ReferenceId="CopyFirstNameToReadonly" />
+            <InputClaimsTransformation ReferenceId="CopyMiddleNameToReadonly" />
+            <InputClaimsTransformation ReferenceId="CopyLastNameToReadonly" />
+            <InputClaimsTransformation ReferenceId="CopyGenderToReadonly" />
+          </InputClaimsTransformations>
+          <InputClaims>
+            <InputClaim ClaimTypeReferenceId="external_FirstName"/> 
+            <InputClaim ClaimTypeReferenceId="external_MiddleName" /> 
+            <InputClaim ClaimTypeReferenceId="external_LastName"/>
+            <InputClaim ClaimTypeReferenceId="external_Gender" />
+
+            <InputClaim ClaimTypeReferenceId="readonly_FirstName"/> 
+            <InputClaim ClaimTypeReferenceId="readonly_MiddleName" /> 
+            <InputClaim ClaimTypeReferenceId="readonly_LastName"/>
+            <InputClaim ClaimTypeReferenceId="readonly_Gender" />
+            <InputClaim ClaimTypeReferenceId="readonly_DateOfBirth"/>
+            <InputClaim ClaimTypeReferenceId="external_Street"/>
+            <!-- TODO: Address Line 2? -->
+            <InputClaim ClaimTypeReferenceId="external_Phone" />
+            <InputClaim ClaimTypeReferenceId="external_City" />
+            <InputClaim ClaimTypeReferenceId="external_State"/>
+            <InputClaim ClaimTypeReferenceId="external_Zip"/>
+          </InputClaims>
           <OutputClaims>
-            <OutputClaim ClaimTypeReferenceId="external_FirstName" Required="true" /> 
-            <OutputClaim ClaimTypeReferenceId="external_MiddleName" /> 
-            <OutputClaim ClaimTypeReferenceId="external_LastName"/>
-            <OutputClaim ClaimTypeReferenceId="external_DateOfBirth" Required="true" /> 
-            <OutputClaim ClaimTypeReferenceId="external_Gender" Required="true" /> 
+            <OutputClaim ClaimTypeReferenceId="readonly_FirstName"/> 
+            <OutputClaim ClaimTypeReferenceId="readonly_MiddleName" /> 
+            <OutputClaim ClaimTypeReferenceId="readonly_LastName"/>
+            <OutputClaim ClaimTypeReferenceId="readonly_DateOfBirth" /> 
+            <OutputClaim ClaimTypeReferenceId="readonly_Gender" /> 
             <OutputClaim ClaimTypeReferenceId="external_Street" /> 
             <OutputClaim ClaimTypeReferenceId="external_Street2" /> 
             <OutputClaim ClaimTypeReferenceId="external_Phone" /> 
@@ -4472,17 +4599,23 @@
 
         <OrchestrationStep Order="2" Type="ClaimsExchange">
           <ClaimsExchanges>
-            <ClaimsExchange Id="SelfAsserted-CollectDemoGraphicsExchange" TechnicalProfileReferenceId="SelfAsserted-CollectDemoGraphics" />
+            <ClaimsExchange Id="GetUserDetails" TechnicalProfileReferenceId="RestApi-GetUserDetails" />
           </ClaimsExchanges>
         </OrchestrationStep>
 
         <OrchestrationStep Order="3" Type="ClaimsExchange">
           <ClaimsExchanges>
-            <ClaimsExchange Id="SelfAsserted-CollectQuestionAnswersExchange" TechnicalProfileReferenceId="SelfAsserted-CollectQuestionAnswers" />
+            <ClaimsExchange Id="SelfAsserted-CollectDemoGraphicsExchange" TechnicalProfileReferenceId="SelfAsserted-CollectDemoGraphics" />
           </ClaimsExchanges>
         </OrchestrationStep>
 
         <OrchestrationStep Order="4" Type="ClaimsExchange">
+          <ClaimsExchanges>
+            <ClaimsExchange Id="SelfAsserted-CollectQuestionAnswersExchange" TechnicalProfileReferenceId="SelfAsserted-CollectQuestionAnswers" />
+          </ClaimsExchanges>
+        </OrchestrationStep>
+
+        <OrchestrationStep Order="5" Type="ClaimsExchange">
           <Preconditions>
             <Precondition Type="ClaimEquals" ExecuteActionsIf="true">
               <Value>external_IsIdentityVerified</Value>
