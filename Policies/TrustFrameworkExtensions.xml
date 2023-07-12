@@ -1796,7 +1796,7 @@
             <OutputClaim ClaimTypeReferenceId="external_FirstName" PartnerClaimType="FirstName"/>
             <OutputClaim ClaimTypeReferenceId="external_MiddleName" PartnerClaimType="MiddleName"/>
             <OutputClaim ClaimTypeReferenceId="external_LastName" PartnerClaimType="LastName"/>
-            <OutputClaim ClaimTypeReferenceId="readonly_DateOfBirth" PartnerClaimType="DateOfBirth"/>
+            <OutputClaim ClaimTypeReferenceId="external_DateOfBirth" PartnerClaimType="DateOfBirth"/>
             <OutputClaim ClaimTypeReferenceId="external_Gender" PartnerClaimType="Gender"/>
             <OutputClaim ClaimTypeReferenceId="external_Street" PartnerClaimType="Address"/>
             <!-- TODO: Address Line 2? -->
@@ -1905,6 +1905,7 @@
             <OutputClaim ClaimTypeReferenceId="external_MiddleName" PartnerClaimType="MiddleName"/>
             <OutputClaim ClaimTypeReferenceId="external_LastName" PartnerClaimType="LastName"/>
             <OutputClaim ClaimTypeReferenceId="external_DateOfBirth" PartnerClaimType="DateOfBirth"/>
+            <OutputClaim ClaimTypeReferenceId="readonly_DateOfBirth" PartnerClaimType="DateOfBirth"/>
             <OutputClaim ClaimTypeReferenceId="external_Gender" PartnerClaimType="Gender"/>
             <OutputClaim ClaimTypeReferenceId="external_Street" PartnerClaimType="Street"/>
             <OutputClaim ClaimTypeReferenceId="external_Street2" PartnerClaimType="Street2"/>
@@ -3139,11 +3140,17 @@
           <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.SelfAssertedAttributeProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
           <Metadata>
             <Item Key="IpAddressClaimReferenceId">IpAddress</Item>
-            <Item Key="ContentDefinitionReferenceId">api.selfasserted</Item>
+            <Item Key="ContentDefinitionReferenceId">api.selfasserted.verify</Item>
           </Metadata>
           <CryptographicKeys>
             <Key Id="issuer_secret" StorageReferenceId="B2C_1A_TokenSigningKeyContainer" />
           </CryptographicKeys>
+          <InputClaimsTransformations>
+            <InputClaimsTransformation ReferenceId="CopyFirstNameToReadonly" />
+            <InputClaimsTransformation ReferenceId="CopyMiddleNameToReadonly" />
+            <InputClaimsTransformation ReferenceId="CopyLastNameToReadonly" />
+            <InputClaimsTransformation ReferenceId="CopyGenderToReadonly" />
+          </InputClaimsTransformations>
           <InputClaims>
             <!-- This needs to be removed once the API to verify demographics is ready.
             Expecting the myChartId as an output claim from verification API -->            
@@ -3154,6 +3161,11 @@
             <InputClaim ClaimTypeReferenceId="external_LastName"/>
             <InputClaim ClaimTypeReferenceId="external_DateOfBirth"/>
             <InputClaim ClaimTypeReferenceId="external_Gender"/>
+            <InputClaim ClaimTypeReferenceId="readonly_FirstName"/>
+            <InputClaim ClaimTypeReferenceId="readonly_MiddleName"/>
+            <InputClaim ClaimTypeReferenceId="readonly_LastName"/>
+            <InputClaim ClaimTypeReferenceId="readonly_DateOfBirth"/>
+            <InputClaim ClaimTypeReferenceId="readonly_Gender"/>
             <InputClaim ClaimTypeReferenceId="external_Street"/>
             <InputClaim ClaimTypeReferenceId="external_Street2"/>
             <InputClaim ClaimTypeReferenceId="external_Phone"/>
@@ -3164,11 +3176,11 @@
           <OutputClaims>
             <OutputClaim ClaimTypeReferenceId="external_MyChartId"/>
             <OutputClaim ClaimTypeReferenceId="external_Id"/>
-            <OutputClaim ClaimTypeReferenceId="external_FirstName"/>
-            <OutputClaim ClaimTypeReferenceId="external_MiddleName"/>
-            <OutputClaim ClaimTypeReferenceId="external_LastName"/>
-            <OutputClaim ClaimTypeReferenceId="external_DateOfBirth"/>
-            <OutputClaim ClaimTypeReferenceId="external_Gender"/>
+            <OutputClaim ClaimTypeReferenceId="readonly_FirstName"/> 
+            <OutputClaim ClaimTypeReferenceId="readonly_MiddleName" /> 
+            <OutputClaim ClaimTypeReferenceId="readonly_LastName"/>
+            <OutputClaim ClaimTypeReferenceId="readonly_DateOfBirth" /> 
+            <OutputClaim ClaimTypeReferenceId="readonly_Gender" /> 
             <OutputClaim ClaimTypeReferenceId="external_Street"/>
             <OutputClaim ClaimTypeReferenceId="external_Street2"/>
             <OutputClaim ClaimTypeReferenceId="external_Phone"/>
@@ -3403,28 +3415,16 @@
           <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.SelfAssertedAttributeProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
           <Metadata>
             <Item Key="IpAddressClaimReferenceId">IpAddress</Item>
-            <Item Key="ContentDefinitionReferenceId">api.selfasserted.verify</Item>            
+            <Item Key="ContentDefinitionReferenceId">api.selfasserted</Item>            
           </Metadata>
           <CryptographicKeys>
             <Key Id="issuer_secret" StorageReferenceId="B2C_1A_TokenSigningKeyContainer" />
           </CryptographicKeys>
-          <InputClaimsTransformations>
-            <InputClaimsTransformation ReferenceId="CopyFirstNameToReadonly" />
-            <InputClaimsTransformation ReferenceId="CopyMiddleNameToReadonly" />
-            <InputClaimsTransformation ReferenceId="CopyLastNameToReadonly" />
-            <InputClaimsTransformation ReferenceId="CopyGenderToReadonly" />
-          </InputClaimsTransformations>
           <InputClaims>
-            <InputClaim ClaimTypeReferenceId="external_FirstName"/> 
-            <InputClaim ClaimTypeReferenceId="external_MiddleName" /> 
+            <InputClaim ClaimTypeReferenceId="external_FirstName"/>
             <InputClaim ClaimTypeReferenceId="external_LastName"/>
-            <InputClaim ClaimTypeReferenceId="external_Gender" />
-
-            <InputClaim ClaimTypeReferenceId="readonly_FirstName"/> 
-            <InputClaim ClaimTypeReferenceId="readonly_MiddleName" /> 
-            <InputClaim ClaimTypeReferenceId="readonly_LastName"/>
-            <InputClaim ClaimTypeReferenceId="readonly_Gender" />
-            <InputClaim ClaimTypeReferenceId="readonly_DateOfBirth"/>
+            <InputClaim ClaimTypeReferenceId="external_DateOfBirth"/>
+            <InputClaim ClaimTypeReferenceId="external_Gender"/>
             <InputClaim ClaimTypeReferenceId="external_Street"/>
             <!-- TODO: Address Line 2? -->
             <InputClaim ClaimTypeReferenceId="external_Phone" />
@@ -3433,13 +3433,10 @@
             <InputClaim ClaimTypeReferenceId="external_Zip"/>
           </InputClaims>
           <OutputClaims>
-            <OutputClaim ClaimTypeReferenceId="readonly_FirstName"/> 
-            <OutputClaim ClaimTypeReferenceId="readonly_MiddleName" /> 
-            <OutputClaim ClaimTypeReferenceId="readonly_LastName"/>
-            <OutputClaim ClaimTypeReferenceId="readonly_DateOfBirth" /> 
-            <OutputClaim ClaimTypeReferenceId="readonly_Gender" /> 
+            <OutputClaim ClaimTypeReferenceId="external_FirstName"/> 
+            <OutputClaim ClaimTypeReferenceId="external_LastName"/>
+            <OutputClaim ClaimTypeReferenceId="external_DateOfBirth" />  
             <OutputClaim ClaimTypeReferenceId="external_Street" /> 
-            <OutputClaim ClaimTypeReferenceId="external_Street2" /> 
             <OutputClaim ClaimTypeReferenceId="external_Phone" /> 
             <OutputClaim ClaimTypeReferenceId="external_City" /> 
             <OutputClaim ClaimTypeReferenceId="external_State" /> 
@@ -4428,8 +4425,6 @@
             <ClaimsExchange Id="SignUp-Fields-WithoutActivationCodeExchange" TechnicalProfileReferenceId="LocalAccount-SelfAssertedFields-WithoutActivationCode" />
           </ClaimsExchanges>
         </OrchestrationStep>
-
-        
 
         <!-- Execute if the user does have an activation code -->
         <OrchestrationStep Order="5" Type="InvokeSubJourney">
