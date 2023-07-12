@@ -93,6 +93,15 @@
         </LocalizedResourcesReferences>
       </ContentDefinition>
 
+      <ContentDefinition Id="api.selfasserted.verify">
+        <LoadUri>{Settings:UIBaseUrl}selfAssertedVerify.html?ver={Settings:Build.BuildNumber}</LoadUri>
+        <RecoveryUri>~/common/default_page_error.html</RecoveryUri>
+        <DataUri>urn:com:microsoft:aad:b2c:elements:contract:selfasserted:2.1.7</DataUri>
+        <Metadata>
+          <Item Key="DisplayName">Collect information from user page</Item>
+        </Metadata>
+      </ContentDefinition>
+
       <ContentDefinition Id="api.phonefactor">
         <LocalizedResourcesReferences MergeBehavior="Prepend">
           <LocalizedResourcesReference Language="en" LocalizedResourcesReferenceId="api.phonefactor.en" />
