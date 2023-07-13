@@ -632,12 +632,6 @@
         <UserInputType>TextBox</UserInputType>
       </ClaimType>
 
-      <ClaimType Id="external_Street2">
-        <DisplayName>Street 2</DisplayName>
-        <DataType>string</DataType>        
-        <UserInputType>TextBox</UserInputType>
-      </ClaimType>
-
       <ClaimType Id="external_Phone">
         <DisplayName>Phone</DisplayName>
         <DataType>string</DataType>        
@@ -878,15 +872,6 @@
         </InputClaims>
         <OutputClaims>
           <OutputClaim ClaimTypeReferenceId="readonly_FirstName" TransformationClaimType="outputClaim" />
-        </OutputClaims>
-      </ClaimsTransformation>
-
-      <ClaimsTransformation Id="CopyMiddleNameToReadonly" TransformationMethod="CopyClaim">
-        <InputClaims>
-          <InputClaim ClaimTypeReferenceId="external_MiddleName" TransformationClaimType="inputClaim" />
-        </InputClaims>
-        <OutputClaims>
-          <OutputClaim ClaimTypeReferenceId="readonly_MiddleName" TransformationClaimType="outputClaim" />
         </OutputClaims>
       </ClaimsTransformation>
 
@@ -1798,12 +1783,10 @@
           </InputClaims>
           <OutputClaims>
             <OutputClaim ClaimTypeReferenceId="external_FirstName" PartnerClaimType="FirstName"/>
-            <OutputClaim ClaimTypeReferenceId="external_MiddleName" PartnerClaimType="MiddleName"/>
             <OutputClaim ClaimTypeReferenceId="external_LastName" PartnerClaimType="LastName"/>
             <OutputClaim ClaimTypeReferenceId="external_DateOfBirth" PartnerClaimType="DateOfBirth"/>
             <OutputClaim ClaimTypeReferenceId="external_Gender" PartnerClaimType="Gender"/>
             <OutputClaim ClaimTypeReferenceId="external_Street" PartnerClaimType="Address"/>
-            <!-- TODO: Address Line 2? -->
             <OutputClaim ClaimTypeReferenceId="external_Phone" PartnerClaimType="PhoneNumber"/>
             <OutputClaim ClaimTypeReferenceId="external_City" PartnerClaimType="City"/>
             <OutputClaim ClaimTypeReferenceId="external_State" PartnerClaimType="State"/>
@@ -1830,7 +1813,7 @@
           </InputClaims>
           <OutputClaims>
             <OutputClaim ClaimTypeReferenceId="external_hasMyChartBeenLinked" PartnerClaimType="HasMyChartBeenLinked"/>
-            <OutputClaim ClaimTypeReferenceId="external_MyChartId" PartnerClaimType="MyChartId"/>
+            <OutputClaim ClaimTypeReferenceId="external_MyChartId" PartnerClaimType="MyChartUserId"/>
           </OutputClaims>
         </TechnicalProfile>
 
@@ -1838,7 +1821,7 @@
           <DisplayName>DFP Create Account</DisplayName>
           <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.RestfulProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
           <Metadata>
-            <Item Key="ServiceUrl">{Settings:IntermediateAppUrl}/api/UserValidation/Question</Item>
+            <Item Key="ServiceUrl">{Settings:IntermediateAppUrl}/api/Adapter/GetQuestions</Item>
             <Item Key="AuthenticationType">Bearer</Item>
             <Item Key="SendClaimsIn">Body</Item>
             <Item Key="AllowInsecureAuthInProduction">True</Item>
@@ -1848,14 +1831,13 @@
           </Metadata>
           <InputClaims>
             <InputClaim ClaimTypeReferenceId="bearerToken" />
+            <InputClaim ClaimTypeReferenceId="objectId" />
 
             <InputClaim ClaimTypeReferenceId="external_FirstName" PartnerClaimType="FirstName" />
-            <InputClaim ClaimTypeReferenceId="external_MiddleName" PartnerClaimType="MiddleName" />
             <InputClaim ClaimTypeReferenceId="external_LastName" PartnerClaimType="LastName" />
             <InputClaim ClaimTypeReferenceId="external_DateOfBirth" PartnerClaimType="DateOfBirth" />
             <InputClaim ClaimTypeReferenceId="external_Gender" PartnerClaimType="Gender" />
             <InputClaim ClaimTypeReferenceId="external_Street" PartnerClaimType="Street" />
-            <InputClaim ClaimTypeReferenceId="external_Street2" PartnerClaimType="Street2" />
             <InputClaim ClaimTypeReferenceId="external_Phone" PartnerClaimType="PhoneNumber" />
             <InputClaim ClaimTypeReferenceId="external_City" PartnerClaimType="City" />
             <InputClaim ClaimTypeReferenceId="external_State" PartnerClaimType="State" />
@@ -1887,7 +1869,7 @@
           <DisplayName>DFP Create Account</DisplayName>
           <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.RestfulProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
           <Metadata>
-            <Item Key="ServiceUrl">{Settings:IntermediateAppUrl}/api/UserValidation/Answer</Item>
+            <Item Key="ServiceUrl">{Settings:IntermediateAppUrl}/api/Adapter/SubmitAnswers</Item>
             <Item Key="AuthenticationType">Bearer</Item>
             <Item Key="SendClaimsIn">Body</Item>
             <Item Key="AllowInsecureAuthInProduction">True</Item>
@@ -1897,22 +1879,20 @@
           </Metadata>
           <InputClaims>
             <InputClaim ClaimTypeReferenceId="bearerToken" />
-
             <InputClaim ClaimTypeReferenceId="external_SessionId" PartnerClaimType="sessionId"/>
-            <InputClaim ClaimTypeReferenceId="external_ProfileId" PartnerClaimType="profileId" DefaultValue="0" />
             <InputClaim ClaimTypeReferenceId="external_SelectedAnswers" PartnerClaimType="answerIndex"/>            
           </InputClaims>
           <OutputClaims>
             <OutputClaim ClaimTypeReferenceId="external_IsIdentityVerified" PartnerClaimType="IsIdentityVerified"/>
-            <OutputClaim ClaimTypeReferenceId="external_MyChartId" PartnerClaimType="MyChartId"/>
+            <OutputClaim ClaimTypeReferenceId="external_MyChartId" PartnerClaimType="MyChartUserId"/>
           </OutputClaims>
         </TechnicalProfile>
 
-        <TechnicalProfile Id="RestApi-UserValidation-GetUserDetails">
+        <TechnicalProfile Id="RestApi-GetUserDetailsWithActivationCode">
           <DisplayName>DFP Create Account</DisplayName>
           <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.RestfulProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
           <Metadata>
-            <Item Key="ServiceUrl">{Settings:IntermediateAppUrl}/api/UserValidation/GetUserDetails</Item>
+            <Item Key="ServiceUrl">{Settings:IntermediateAppUrl}/api/Adapter/GetUserWithActivationCode</Item>
             <Item Key="AuthenticationType">Bearer</Item>
             <Item Key="SendClaimsIn">Body</Item>
             <Item Key="AllowInsecureAuthInProduction">True</Item>
@@ -1922,20 +1902,16 @@
           </Metadata>
           <InputClaims>
             <InputClaim ClaimTypeReferenceId="bearerToken" />
-            <InputClaim ClaimTypeReferenceId="dateOfBirth" PartnerClaimType="DateofBirth"/>
-            <InputClaim ClaimTypeReferenceId="activationCode" PartnerClaimType="ActivationCode"/>
+            <InputClaim ClaimTypeReferenceId="dateOfBirth" PartnerClaimType="DateOfBirth"/>
+            <InputClaim ClaimTypeReferenceId="activationCode" PartnerClaimType="MyChartActivationCode"/>
           </InputClaims>
           <OutputClaims>
-            <OutputClaim ClaimTypeReferenceId="external_MyChartId" PartnerClaimType="MyChartId"/>
-            <OutputClaim ClaimTypeReferenceId="external_Id" PartnerClaimType="Id"/>
             <OutputClaim ClaimTypeReferenceId="external_FirstName" PartnerClaimType="FirstName"/>
-            <OutputClaim ClaimTypeReferenceId="external_MiddleName" PartnerClaimType="MiddleName"/>
             <OutputClaim ClaimTypeReferenceId="external_LastName" PartnerClaimType="LastName"/>
-            <OutputClaim ClaimTypeReferenceId="external_DateOfBirth" PartnerClaimType="DateOfBirth"/>
             <OutputClaim ClaimTypeReferenceId="readonly_DateOfBirth" PartnerClaimType="DateOfBirth"/>
+            <OutputClaim ClaimTypeReferenceId="external_DateOfBirth" PartnerClaimType="DateOfBirth"/>
             <OutputClaim ClaimTypeReferenceId="external_Gender" PartnerClaimType="Gender"/>
-            <OutputClaim ClaimTypeReferenceId="external_Street" PartnerClaimType="Street"/>
-            <OutputClaim ClaimTypeReferenceId="external_Street2" PartnerClaimType="Street2"/>
+            <OutputClaim ClaimTypeReferenceId="external_Street" PartnerClaimType="Address"/>
             <OutputClaim ClaimTypeReferenceId="external_Phone" PartnerClaimType="PhoneNumber"/>
             <OutputClaim ClaimTypeReferenceId="external_City" PartnerClaimType="City"/>
             <OutputClaim ClaimTypeReferenceId="external_State" PartnerClaimType="State"/>
@@ -1943,11 +1919,11 @@
           </OutputClaims>
         </TechnicalProfile>
 
-        <TechnicalProfile Id="RestApi-UserValidation-ValidateUserDetails">
+        <TechnicalProfile Id="RestApi-CreateUserWithValidationCode">
           <DisplayName>DFP Create Account</DisplayName>
           <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.RestfulProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
           <Metadata>
-            <Item Key="ServiceUrl">{Settings:IntermediateAppUrl}/api/UserValidation/ValidateUserDetails</Item>
+            <Item Key="ServiceUrl">{Settings:IntermediateAppUrl}/api/Adapter/CreateUser</Item>
             <Item Key="AuthenticationType">Bearer</Item>
             <Item Key="SendClaimsIn">Body</Item>
             <Item Key="AllowInsecureAuthInProduction">True</Item>
@@ -1957,25 +1933,25 @@
           </Metadata>
           <InputClaims>
             <InputClaim ClaimTypeReferenceId="bearerToken" />
-            <InputClaim ClaimTypeReferenceId="external_Id" PartnerClaimType="Id"/>
+            <InputClaim ClaimTypeReferenceId="objectId" PartnerClaimType="ObjectId"/>
             <InputClaim ClaimTypeReferenceId="external_FirstName" PartnerClaimType="FirstName" />
-            <InputClaim ClaimTypeReferenceId="external_MiddleName" PartnerClaimType="MiddleName" />
             <InputClaim ClaimTypeReferenceId="external_LastName" PartnerClaimType="LastName" />
             <InputClaim ClaimTypeReferenceId="external_DateOfBirth" PartnerClaimType="DateOfBirth" />
             <InputClaim ClaimTypeReferenceId="external_Gender" PartnerClaimType="Gender" />
-            <InputClaim ClaimTypeReferenceId="external_Street" PartnerClaimType="Street" />
-            <InputClaim ClaimTypeReferenceId="external_Street2" PartnerClaimType="Street2" />
+            <InputClaim ClaimTypeReferenceId="email" PartnerClaimType="Email"/>
+            <InputClaim ClaimTypeReferenceId="external_Street" PartnerClaimType="Address" />
             <InputClaim ClaimTypeReferenceId="external_Phone" PartnerClaimType="PhoneNumber" />
             <InputClaim ClaimTypeReferenceId="external_City" PartnerClaimType="City" />
             <InputClaim ClaimTypeReferenceId="external_State" PartnerClaimType="State" />
             <InputClaim ClaimTypeReferenceId="external_Zip" PartnerClaimType="ZipCode" />
+            <InputClaim ClaimTypeReferenceId="activationCode" PartnerClaimType="MyChartActivationCode" />
           </InputClaims>
           <OutputClaims>
-            <OutputClaim ClaimTypeReferenceId="external_IsUserValid" PartnerClaimType="IsValid"/>
+            <OutputClaim ClaimTypeReferenceId="external_MyChartId" PartnerClaimType="MyChartUserId"/>
           </OutputClaims>
         </TechnicalProfile>
 
-        <TechnicalProfile Id="RestApi-UserValidation-CreateUser">
+        <TechnicalProfile Id="RestApi-CreateUserWithoutValidationCode">
           <DisplayName>DFP Create Account</DisplayName>
           <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.RestfulProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
           <Metadata>
@@ -1990,12 +1966,10 @@
           <InputClaims>
             <InputClaim ClaimTypeReferenceId="bearerToken" />
             <InputClaim ClaimTypeReferenceId="external_FirstName" PartnerClaimType="FirstName" />
-            <InputClaim ClaimTypeReferenceId="external_MiddleName" PartnerClaimType="MiddleName" />
             <InputClaim ClaimTypeReferenceId="external_LastName" PartnerClaimType="LastName" />
             <InputClaim ClaimTypeReferenceId="external_DateOfBirth" PartnerClaimType="DateOfBirth" />
             <InputClaim ClaimTypeReferenceId="external_Gender" PartnerClaimType="Gender" />
             <InputClaim ClaimTypeReferenceId="external_Street" PartnerClaimType="Street" />
-            <InputClaim ClaimTypeReferenceId="external_Street2" PartnerClaimType="Street2" />
             <InputClaim ClaimTypeReferenceId="external_Phone" PartnerClaimType="PhoneNumber" />
             <InputClaim ClaimTypeReferenceId="external_City" PartnerClaimType="City" />
             <InputClaim ClaimTypeReferenceId="external_State" PartnerClaimType="State" />
@@ -3075,7 +3049,6 @@
           </CryptographicKeys>
           <OutputClaims>
             <OutputClaim ClaimTypeReferenceId="external_Street" Required="true"/>
-            <OutputClaim ClaimTypeReferenceId="external_Street2" Required="false"/>
             <OutputClaim ClaimTypeReferenceId="external_Phone" Required="true"/>
             <OutputClaim ClaimTypeReferenceId="external_City" Required="true"/>
             <OutputClaim ClaimTypeReferenceId="external_State" Required="true"/>
@@ -3096,23 +3069,19 @@
           <OutputClaims>
             <OutputClaim ClaimTypeReferenceId="dateOfBirth" Required="true" />
             <OutputClaim ClaimTypeReferenceId="activationCode" Required="true" />
-
-            <OutputClaim ClaimTypeReferenceId="external_Id"/>
-            <OutputClaim ClaimTypeReferenceId="external_MyChartId"/>
             <OutputClaim ClaimTypeReferenceId="external_FirstName"/>
-            <OutputClaim ClaimTypeReferenceId="external_MiddleName"/>
             <OutputClaim ClaimTypeReferenceId="external_LastName"/>
+            <OutputClaim ClaimTypeReferenceId="readonly_DateOfBirth"/>
             <OutputClaim ClaimTypeReferenceId="external_DateOfBirth"/>
             <OutputClaim ClaimTypeReferenceId="external_Gender"/>
             <OutputClaim ClaimTypeReferenceId="external_Street"/>
-            <OutputClaim ClaimTypeReferenceId="external_Street2"/>
             <OutputClaim ClaimTypeReferenceId="external_Phone"/>
             <OutputClaim ClaimTypeReferenceId="external_City"/>
             <OutputClaim ClaimTypeReferenceId="external_State"/>
             <OutputClaim ClaimTypeReferenceId="external_Zip"/>
           </OutputClaims>          
           <ValidationTechnicalProfiles>
-            <ValidationTechnicalProfile ReferenceId="RestApi-UserValidation-GetUserDetails" />
+            <ValidationTechnicalProfile ReferenceId="RestApi-GetUserDetailsWithActivationCode" />
           </ValidationTechnicalProfiles>  
           <UseTechnicalProfileForSessionManagement ReferenceId="SM-AAD" />
         </TechnicalProfile>
@@ -3134,9 +3103,7 @@
             <OutputClaim ClaimTypeReferenceId="dateOfBirth" />
             <OutputClaim ClaimTypeReferenceId="activationCode" />
             <OutputClaim ClaimTypeReferenceId="myChartIdLinkingSelectedOption"/>
-
             <OutputClaim ClaimTypeReferenceId="external_myChartId" />
-
           </OutputClaims>
           <ValidationTechnicalProfiles>
             <ValidationTechnicalProfile ReferenceId="RestApi-LinkSignedInUserWithActivationCode" />
@@ -3156,55 +3123,40 @@
           </CryptographicKeys>
           <InputClaimsTransformations>
             <InputClaimsTransformation ReferenceId="CopyFirstNameToReadonly" />
-            <InputClaimsTransformation ReferenceId="CopyMiddleNameToReadonly" />
             <InputClaimsTransformation ReferenceId="CopyLastNameToReadonly" />
             <InputClaimsTransformation ReferenceId="CopyGenderToReadonly" />
           </InputClaimsTransformations>
           <InputClaims>
-            <!-- This needs to be removed once the API to verify demographics is ready.
-            Expecting the myChartId as an output claim from verification API -->            
-            <InputClaim ClaimTypeReferenceId="external_MyChartId"/>
-            <InputClaim ClaimTypeReferenceId="external_Id"/>
+            <InputClaim ClaimTypeReferenceId="activationCode" />
             <InputClaim ClaimTypeReferenceId="external_FirstName"/>
-            <InputClaim ClaimTypeReferenceId="external_MiddleName"/>
             <InputClaim ClaimTypeReferenceId="external_LastName"/>
             <InputClaim ClaimTypeReferenceId="external_DateOfBirth"/>
             <InputClaim ClaimTypeReferenceId="external_Gender"/>
             <InputClaim ClaimTypeReferenceId="readonly_FirstName"/>
-            <InputClaim ClaimTypeReferenceId="readonly_MiddleName"/>
             <InputClaim ClaimTypeReferenceId="readonly_LastName"/>
             <InputClaim ClaimTypeReferenceId="readonly_DateOfBirth"/>
             <InputClaim ClaimTypeReferenceId="readonly_Gender"/>
             <InputClaim ClaimTypeReferenceId="external_Street"/>
-            <InputClaim ClaimTypeReferenceId="external_Street2"/>
             <InputClaim ClaimTypeReferenceId="external_Phone"/>
             <InputClaim ClaimTypeReferenceId="external_City"/>
             <InputClaim ClaimTypeReferenceId="external_State"/>
             <InputClaim ClaimTypeReferenceId="external_Zip"/>
           </InputClaims>
           <OutputClaims>
-            <OutputClaim ClaimTypeReferenceId="external_MyChartId"/>
-            <OutputClaim ClaimTypeReferenceId="external_Id"/>
             <OutputClaim ClaimTypeReferenceId="readonly_FirstName"/> 
-            <OutputClaim ClaimTypeReferenceId="readonly_MiddleName" /> 
             <OutputClaim ClaimTypeReferenceId="readonly_LastName"/>
             <OutputClaim ClaimTypeReferenceId="readonly_DateOfBirth" /> 
             <OutputClaim ClaimTypeReferenceId="readonly_Gender" /> 
             <OutputClaim ClaimTypeReferenceId="external_Street"/>
-            <OutputClaim ClaimTypeReferenceId="external_Street2"/>
             <OutputClaim ClaimTypeReferenceId="external_Phone"/>
             <OutputClaim ClaimTypeReferenceId="external_City"/>
             <OutputClaim ClaimTypeReferenceId="external_State"/>
             <OutputClaim ClaimTypeReferenceId="external_Zip"/>
           </OutputClaims>
-
           <OutputClaimsTransformations>
             <OutputClaimsTransformation ReferenceId="CopyGivenNameFrom_External_FirstName" />
             <OutputClaimsTransformation ReferenceId="CopySurNameFrom_External_LastName" />
           </OutputClaimsTransformations>
-          <ValidationTechnicalProfiles> 
-            <ValidationTechnicalProfile ReferenceId="RestApi-UserValidation-ValidateUserDetails" />
-          </ValidationTechnicalProfiles>  
           <UseTechnicalProfileForSessionManagement ReferenceId="SM-AAD" />
         </TechnicalProfile>
 
@@ -3221,20 +3173,28 @@
           </CryptographicKeys>
           <InputClaims>
             <InputClaim ClaimTypeReferenceId="email" />
-            <InputClaim ClaimTypeReferenceId="external_MyChartId" />
             <InputClaim ClaimTypeReferenceId="userMessage" DefaultValue="Please fill out your password and information to continue creating your account." AlwaysUseDefaultValue="true"/>
             <InputClaim ClaimTypeReferenceId="givenName" />
             <InputClaim ClaimTypeReferenceId="surName" />
+
+            <InputClaim ClaimTypeReferenceId="external_FirstName" />
+            <InputClaim ClaimTypeReferenceId="external_LastName" />
+            <InputClaim ClaimTypeReferenceId="external_DateOfBirth"/>
+            <InputClaim ClaimTypeReferenceId="external_Gender" />
+            <InputClaim ClaimTypeReferenceId="external_Street" />
+            <InputClaim ClaimTypeReferenceId="external_Phone" />
+            <InputClaim ClaimTypeReferenceId="external_City" />
+            <InputClaim ClaimTypeReferenceId="external_State"/>
+            <InputClaim ClaimTypeReferenceId="external_Zip" />
+            <InputClaim ClaimTypeReferenceId="activationCode"/>
           </InputClaims>
           <DisplayClaims>            
             <DisplayClaim DisplayControlReferenceId="emailVerificationControl-InputOrVerify" />
-            <!-- <DisplayClaim ClaimTypeReferenceId="givenName"/>
-            <DisplayClaim ClaimTypeReferenceId="surName"/> -->
             <DisplayClaim ClaimTypeReferenceId="newPassword" Required="true"/>
             <DisplayClaim ClaimTypeReferenceId="reenterPassword"/>
           </DisplayClaims>
           <OutputClaims>
-            <OutputClaim ClaimTypeReferenceId="objectId" />
+            <OutputClaim ClaimTypeReferenceId="objectId"></OutputClaim>
             <OutputClaim ClaimTypeReferenceId="email"/>
             <OutputClaim ClaimTypeReferenceId="newPassword" Required="true" />
             <OutputClaim ClaimTypeReferenceId="reenterPassword" Required="true" />
@@ -3242,12 +3202,11 @@
             <OutputClaim ClaimTypeReferenceId="authenticationSource" />
             <OutputClaim ClaimTypeReferenceId="newUser" />
 
-            <!-- Optional claims, to be collected from the user -->
             <OutputClaim ClaimTypeReferenceId="givenName" />
             <OutputClaim ClaimTypeReferenceId="surName" />
 
             <OutputClaim ClaimTypeReferenceId="isActiveEmailSession"  DefaultValue="true" AlwaysUseDefaultValue="true"/>
-
+            <OutputClaim ClaimTypeReferenceId="external_MyChartId"/>
             <OutputClaim ClaimTypeReferenceId="dfp_merchantRuleDecision" />
             <OutputClaim ClaimTypeReferenceId="dfp_Id" />
             <OutputClaim ClaimTypeReferenceId="dfp_TransactionReferenceId"/>
@@ -3277,9 +3236,9 @@
           <ValidationTechnicalProfiles>
             
             <!-- Check if the user already exists. If yes, retrieve the chart id. -->
-            <ValidationTechnicalProfile ReferenceId="AAD-UserReadChartIdDetailsUsingEmailAddress-NoError" />
-
-            <ValidationTechnicalProfile ReferenceId="ValidateUserChartId"/>
+            <!-- TODO: Check what is this for -->
+            <!--ValidationTechnicalProfile ReferenceId="AAD-UserReadChartIdDetailsUsingEmailAddress-NoError" /-->
+            <!--ValidationTechnicalProfile ReferenceId="ValidateUserChartId"/-->
 
             <ValidationTechnicalProfile ReferenceId="REST-AcquireAccessToken">
               <Preconditions>
@@ -3291,23 +3250,10 @@
             </ValidationTechnicalProfile>
 
             <!-- Q: Need to call DFP Sign up if the user already exists and chart id not linked? -->
-            <ValidationTechnicalProfile ReferenceId="RestApi-DFP-CreateAccount">
-              <Preconditions>
-                <!-- User already exist in directory. No user creation involved -->
-                <Precondition Type="ClaimsExist" ExecuteActionsIf="true">
-                  <Value>temp_objectId</Value>
-                  <Action>SkipThisValidationTechnicalProfile</Action>
-                </Precondition>
-              </Preconditions>
-            </ValidationTechnicalProfile>
+            <ValidationTechnicalProfile ReferenceId="RestApi-DFP-CreateAccount" />
 
             <ValidationTechnicalProfile ReferenceId="RestApi-DFP-CreateAccountStatus-Rejected">
               <Preconditions>
-                <!-- User already exist in directory. No user creation involved -->
-                <Precondition Type="ClaimsExist" ExecuteActionsIf="true">
-                  <Value>temp_objectId</Value>
-                  <Action>SkipThisValidationTechnicalProfile</Action>
-                </Precondition>
                 <Precondition Type="ClaimsExist" ExecuteActionsIf="false">
                   <Value>dfp_merchantRuleDecision</Value>
                   <Action>SkipThisValidationTechnicalProfile</Action>
@@ -3320,13 +3266,8 @@
               </Preconditions>
             </ValidationTechnicalProfile>           
 
-            <ValidationTechnicalProfile ReferenceId="AAD-UserWriteUsingLogonEmail-WithChartId-Custom">
+            <ValidationTechnicalProfile ReferenceId="AAD-UserWriteUsingLogonEmail-Custom">
               <Preconditions>
-                <Precondition Type="ClaimEquals" ExecuteActionsIf="true">
-                  <Value>isMyChartIdExist</Value>
-                  <Value>True</Value>
-                  <Action>SkipThisValidationTechnicalProfile</Action>
-                </Precondition>
                 <Precondition Type="ClaimsExist" ExecuteActionsIf="false">
                   <Value>dfp_merchantRuleDecision</Value>
                   <Action>SkipThisValidationTechnicalProfile</Action>
@@ -3334,23 +3275,13 @@
                 <Precondition Type="ClaimEquals" ExecuteActionsIf="true">
                   <Value>dfp_merchantRuleDecision</Value>
                   <Value>Reject</Value>
-                  <Action>SkipThisValidationTechnicalProfile</Action>
-                </Precondition>
-                <!-- User already exist in directory. No user creation involved -->
-                <Precondition Type="ClaimsExist" ExecuteActionsIf="true">
-                  <Value>temp_objectId</Value>
                   <Action>SkipThisValidationTechnicalProfile</Action>
                 </Precondition>
               </Preconditions>
             </ValidationTechnicalProfile>
 
-            <ValidationTechnicalProfile ReferenceId="RestApi-UserValidation-CreateUser">
+            <ValidationTechnicalProfile ReferenceId="RestApi-CreateUserWithValidationCode">
               <Preconditions>
-                <Precondition Type="ClaimEquals" ExecuteActionsIf="true">
-                  <Value>isMyChartIdExist</Value>
-                  <Value>True</Value>
-                  <Action>SkipThisValidationTechnicalProfile</Action>
-                </Precondition>
                 <Precondition Type="ClaimsExist" ExecuteActionsIf="false">
                   <Value>dfp_merchantRuleDecision</Value>
                   <Action>SkipThisValidationTechnicalProfile</Action>
@@ -3358,11 +3289,6 @@
                 <Precondition Type="ClaimEquals" ExecuteActionsIf="true">
                   <Value>dfp_merchantRuleDecision</Value>
                   <Value>Reject</Value>
-                  <Action>SkipThisValidationTechnicalProfile</Action>
-                </Precondition>
-                <!-- User already exist in directory. No user creation involved -->
-                <Precondition Type="ClaimsExist" ExecuteActionsIf="true">
-                  <Value>temp_objectId</Value>
                   <Action>SkipThisValidationTechnicalProfile</Action>
                 </Precondition>
               </Preconditions>
@@ -3370,11 +3296,6 @@
 
             <ValidationTechnicalProfile ReferenceId="AAD-UserWriteLinkChartIdToUserUsingEmailAddress">
               <Preconditions>
-                <Precondition Type="ClaimEquals" ExecuteActionsIf="true">
-                  <Value>isMyChartIdExist</Value>
-                  <Value>True</Value>
-                  <Action>SkipThisValidationTechnicalProfile</Action>
-                </Precondition>
                 <Precondition Type="ClaimsExist" ExecuteActionsIf="false">
                   <Value>dfp_merchantRuleDecision</Value>
                   <Action>SkipThisValidationTechnicalProfile</Action>
@@ -3382,10 +3303,6 @@
                 <Precondition Type="ClaimEquals" ExecuteActionsIf="true">
                   <Value>dfp_merchantRuleDecision</Value>
                   <Value>Reject</Value>
-                  <Action>SkipThisValidationTechnicalProfile</Action>
-                </Precondition>
-                <Precondition Type="ClaimsExist" ExecuteActionsIf="false">
-                  <Value>temp_objectId</Value>
                   <Action>SkipThisValidationTechnicalProfile</Action>
                 </Precondition>
               </Preconditions>
@@ -3393,11 +3310,6 @@
 
             <ValidationTechnicalProfile ReferenceId="RestApi-DFP-CreateAccountStatus-Approved">
               <Preconditions>
-                <Precondition Type="ClaimEquals" ExecuteActionsIf="true">
-                  <Value>isMyChartIdExist</Value>
-                  <Value>True</Value>
-                  <Action>SkipThisValidationTechnicalProfile</Action>
-                </Precondition>
                 <Precondition Type="ClaimsExist" ExecuteActionsIf="false">
                   <Value>dfp_merchantRuleDecision</Value>
                   <Action>SkipThisValidationTechnicalProfile</Action>
@@ -3407,14 +3319,8 @@
                   <Value>Reject</Value>
                   <Action>SkipThisValidationTechnicalProfile</Action>
                 </Precondition>
-                <!-- User already exist in directory. No user creation involved -->
-                <Precondition Type="ClaimsExist" ExecuteActionsIf="true">
-                  <Value>temp_objectId</Value>
-                  <Action>SkipThisValidationTechnicalProfile</Action>
-                </Precondition>
               </Preconditions>
             </ValidationTechnicalProfile>
-
           </ValidationTechnicalProfiles>
           <UseTechnicalProfileForSessionManagement ReferenceId="SM-AAD" />
         </TechnicalProfile>
@@ -4547,20 +4453,8 @@
           </ClaimsExchanges>
         </OrchestrationStep>
 
-        <OrchestrationStep Order="2" Type="ClaimsExchange">
-          <Preconditions> 
-            <Precondition Type="ClaimsExist" ExecuteActionsIf="true">
-              <Value>objectId</Value>
-              <Action>SkipThisOrchestrationStep</Action>
-            </Precondition>
-          </Preconditions>
-          <ClaimsExchanges>
-            <ClaimsExchange Id="VerifyUser-CollectCodeExchange" TechnicalProfileReferenceId="VerifyUser-WithActivationCode-CollectCode" />
-          </ClaimsExchanges>
-        </OrchestrationStep>
-
         <!-- If linking a signed in user -->
-        <OrchestrationStep Order="3" Type="ClaimsExchange">
+        <OrchestrationStep Order="2" Type="ClaimsExchange">
           <Preconditions>
             <Precondition Type="ClaimsExist" ExecuteActionsIf="false">
               <Value>objectId</Value>
@@ -4572,17 +4466,24 @@
           </ClaimsExchanges>
         </OrchestrationStep>
 
+        <OrchestrationStep Order="3" Type="ClaimsExchange">
+          <Preconditions> 
+            <Precondition Type="ClaimsExist" ExecuteActionsIf="true">
+              <Value>objectId</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
+          </Preconditions>
+          <ClaimsExchanges>
+            <ClaimsExchange Id="VerifyUser-CollectCodeExchange" TechnicalProfileReferenceId="VerifyUser-WithActivationCode-CollectCode" />
+          </ClaimsExchanges>
+        </OrchestrationStep>
+
         <!-- If linking during signup -->
         <OrchestrationStep Order="4" Type="ClaimsExchange">
           <Preconditions>
             <!-- Linking a signed in user, needn't show demographics. -->
             <Precondition Type="ClaimsExist" ExecuteActionsIf="true">
               <Value>objectId</Value>
-              <Action>SkipThisOrchestrationStep</Action>
-            </Precondition>
-            <Precondition Type="ClaimEquals" ExecuteActionsIf="true">
-              <Value>myChartIdLinkingSelectedOption</Value>
-              <Value>experian</Value>
               <Action>SkipThisOrchestrationStep</Action>
             </Precondition>
           </Preconditions>
