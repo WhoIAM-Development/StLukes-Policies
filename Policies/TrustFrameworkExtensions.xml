@@ -526,6 +526,10 @@
         <UserInputType>TextBox</UserInputType>
       </ClaimType>
 
+      <ClaimType Id="external_hasMyChartBeenLinked">
+        <DataType>boolean</DataType>
+      </ClaimType>
+
       <ClaimType Id="myChartIdFromApi">
         <DisplayName>User's myChartId recieved from API</DisplayName>
         <DataType>string</DataType>        
@@ -1807,6 +1811,29 @@
           </OutputClaims>
         </TechnicalProfile>
 
+        <TechnicalProfile Id="RestApi-LinkSignedInUserWithActivationCode">
+          <DisplayName>DFP Create Account</DisplayName>
+          <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.RestfulProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+          <Metadata>
+            <Item Key="ServiceUrl">{Settings:IntermediateAppUrl}/api/Adapter/LinkUserWithActivationCode</Item>
+            <Item Key="AuthenticationType">Bearer</Item>
+            <Item Key="SendClaimsIn">Body</Item>
+            <Item Key="AllowInsecureAuthInProduction">True</Item>
+            <Item Key="IncludeClaimResolvingInClaimsHandling">true</Item>
+            <Item Key="UseClaimAsBearerToken">bearerToken</Item>
+            <Item Key="ResolveJsonPathsInJsonTokens">true</Item>
+          </Metadata>
+          <InputClaims>
+            <InputClaim ClaimTypeReferenceId="bearerToken" />
+            <InputClaim ClaimTypeReferenceId="activationCode" PartnerClaimType="MyChartActivationCode"/>
+            <InputClaim ClaimTypeReferenceId="objectId" PartnerClaimType="ObjectId"/>
+          </InputClaims>
+          <OutputClaims>
+            <OutputClaim ClaimTypeReferenceId="external_hasMyChartBeenLinked" PartnerClaimType="HasMyChartBeenLinked"/>
+            <OutputClaim ClaimTypeReferenceId="external_MyChartId" PartnerClaimType="MyChartId"/>
+          </OutputClaims>
+        </TechnicalProfile>
+
         <TechnicalProfile Id="RestApi-UserValidation-GetQuestions">
           <DisplayName>DFP Create Account</DisplayName>
           <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.RestfulProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
@@ -2932,7 +2959,7 @@
             <OutputClaim ClaimTypeReferenceId="executed-SelfAsserted-Input" DefaultValue="true" />
             <OutputClaim ClaimTypeReferenceId="authenticationSource" />
             <OutputClaim ClaimTypeReferenceId="newUser" />
-
+          
             <!-- Optional claims, to be collected from the user -->
             <OutputClaim ClaimTypeReferenceId="external_DateOfBirth" Required="true"/>
             <OutputClaim ClaimTypeReferenceId="givenName" Required="true" />
@@ -3100,37 +3127,19 @@
           <CryptographicKeys>
             <Key Id="issuer_secret" StorageReferenceId="B2C_1A_TokenSigningKeyContainer" />
           </CryptographicKeys>
+          <InputClaims>
+            <InputClaim ClaimTypeReferenceId="objectId"/>
+          </InputClaims>
           <OutputClaims>
             <OutputClaim ClaimTypeReferenceId="dateOfBirth" />
             <OutputClaim ClaimTypeReferenceId="activationCode" />
             <OutputClaim ClaimTypeReferenceId="myChartIdLinkingSelectedOption"/>
 
-            <OutputClaim ClaimTypeReferenceId="external_Id"/>
-            <OutputClaim ClaimTypeReferenceId="external_MyChartId"/>
-            <OutputClaim ClaimTypeReferenceId="external_FirstName"/>
-            <OutputClaim ClaimTypeReferenceId="external_MiddleName"/>
-            <OutputClaim ClaimTypeReferenceId="external_LastName"/>
-            <OutputClaim ClaimTypeReferenceId="external_DateOfBirth"/>
-            <OutputClaim ClaimTypeReferenceId="external_Gender"/>
-            <OutputClaim ClaimTypeReferenceId="external_Street"/>
-            <OutputClaim ClaimTypeReferenceId="external_Street2"/>
-            <OutputClaim ClaimTypeReferenceId="external_Phone"/>
-            <OutputClaim ClaimTypeReferenceId="external_City"/>
-            <OutputClaim ClaimTypeReferenceId="external_State"/>
-            <OutputClaim ClaimTypeReferenceId="external_Zip"/>
+            <OutputClaim ClaimTypeReferenceId="external_myChartId" />
 
           </OutputClaims>
-          <!-- Placeholder for the external API call -  dob and activation code.  -->
           <ValidationTechnicalProfiles>
-            <ValidationTechnicalProfile ReferenceId="RestApi-UserValidation-GetUserDetails">
-              <Preconditions>
-                <Precondition Type="ClaimEquals" ExecuteActionsIf="true">
-                  <Value>myChartIdLinkingSelectedOption</Value>
-                  <Value>experian</Value>
-                  <Action>SkipThisValidationTechnicalProfile</Action>
-                </Precondition>
-              </Preconditions>
-            </ValidationTechnicalProfile>            
+            <ValidationTechnicalProfile ReferenceId="RestApi-LinkSignedInUserWithActivationCode" />
           </ValidationTechnicalProfiles>  
           <UseTechnicalProfileForSessionManagement ReferenceId="SM-AAD" />
         </TechnicalProfile>
@@ -4550,6 +4559,7 @@
           </ClaimsExchanges>
         </OrchestrationStep>
 
+        <!-- If linking a signed in user -->
         <OrchestrationStep Order="3" Type="ClaimsExchange">
           <Preconditions>
             <Precondition Type="ClaimsExist" ExecuteActionsIf="false">
@@ -4562,8 +4572,14 @@
           </ClaimsExchanges>
         </OrchestrationStep>
 
+        <!-- If linking during signup -->
         <OrchestrationStep Order="4" Type="ClaimsExchange">
           <Preconditions>
+            <!-- Linking a signed in user, needn't show demographics. -->
+            <Precondition Type="ClaimsExist" ExecuteActionsIf="true">
+              <Value>objectId</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
             <Precondition Type="ClaimEquals" ExecuteActionsIf="true">
               <Value>myChartIdLinkingSelectedOption</Value>
               <Value>experian</Value>
