@@ -1921,6 +1921,17 @@
 
         <TechnicalProfile Id="RestApi-CreateUserWithValidationCode">
           <DisplayName>DFP Create Account</DisplayName>
+          <InputClaims>
+            <InputClaim ClaimTypeReferenceId="activationCode" PartnerClaimType="MyChartActivationCode" />
+          </InputClaims>
+          <OutputClaims>
+            <OutputClaim ClaimTypeReferenceId="external_MyChartId" PartnerClaimType="MyChartUserId"/>
+          </OutputClaims>
+          <IncludeTechnicalProfile ReferenceId="RestApi-CreateUserWithoutValidationCode" />
+        </TechnicalProfile>
+
+        <TechnicalProfile Id="RestApi-CreateUserWithoutValidationCode">
+          <DisplayName>DFP Create Account</DisplayName>
           <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.RestfulProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
           <Metadata>
             <Item Key="ServiceUrl">{Settings:IntermediateAppUrl}/api/Adapter/CreateUser</Item>
@@ -1934,42 +1945,12 @@
           <InputClaims>
             <InputClaim ClaimTypeReferenceId="bearerToken" />
             <InputClaim ClaimTypeReferenceId="objectId" PartnerClaimType="ObjectId"/>
-            <InputClaim ClaimTypeReferenceId="external_FirstName" PartnerClaimType="FirstName" />
-            <InputClaim ClaimTypeReferenceId="external_LastName" PartnerClaimType="LastName" />
-            <InputClaim ClaimTypeReferenceId="external_DateOfBirth" PartnerClaimType="DateOfBirth" />
-            <InputClaim ClaimTypeReferenceId="external_Gender" PartnerClaimType="Gender" />
             <InputClaim ClaimTypeReferenceId="email" PartnerClaimType="Email"/>
-            <InputClaim ClaimTypeReferenceId="external_Street" PartnerClaimType="Address" />
-            <InputClaim ClaimTypeReferenceId="external_Phone" PartnerClaimType="PhoneNumber" />
-            <InputClaim ClaimTypeReferenceId="external_City" PartnerClaimType="City" />
-            <InputClaim ClaimTypeReferenceId="external_State" PartnerClaimType="State" />
-            <InputClaim ClaimTypeReferenceId="external_Zip" PartnerClaimType="ZipCode" />
-            <InputClaim ClaimTypeReferenceId="activationCode" PartnerClaimType="MyChartActivationCode" />
-          </InputClaims>
-          <OutputClaims>
-            <OutputClaim ClaimTypeReferenceId="external_MyChartId" PartnerClaimType="MyChartUserId"/>
-          </OutputClaims>
-        </TechnicalProfile>
-
-        <TechnicalProfile Id="RestApi-CreateUserWithoutValidationCode">
-          <DisplayName>DFP Create Account</DisplayName>
-          <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.RestfulProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
-          <Metadata>
-            <Item Key="ServiceUrl">{Settings:IntermediateAppUrl}/api/UserValidation/CreateUser</Item>
-            <Item Key="AuthenticationType">Bearer</Item>
-            <Item Key="SendClaimsIn">Body</Item>
-            <Item Key="AllowInsecureAuthInProduction">True</Item>
-            <Item Key="IncludeClaimResolvingInClaimsHandling">true</Item>
-            <Item Key="UseClaimAsBearerToken">bearerToken</Item>
-            <Item Key="ResolveJsonPathsInJsonTokens">true</Item>
-          </Metadata>
-          <InputClaims>
-            <InputClaim ClaimTypeReferenceId="bearerToken" />
             <InputClaim ClaimTypeReferenceId="external_FirstName" PartnerClaimType="FirstName" />
             <InputClaim ClaimTypeReferenceId="external_LastName" PartnerClaimType="LastName" />
             <InputClaim ClaimTypeReferenceId="external_DateOfBirth" PartnerClaimType="DateOfBirth" />
             <InputClaim ClaimTypeReferenceId="external_Gender" PartnerClaimType="Gender" />
-            <InputClaim ClaimTypeReferenceId="external_Street" PartnerClaimType="Street" />
+            <InputClaim ClaimTypeReferenceId="external_Street" PartnerClaimType="Address" />
             <InputClaim ClaimTypeReferenceId="external_Phone" PartnerClaimType="PhoneNumber" />
             <InputClaim ClaimTypeReferenceId="external_City" PartnerClaimType="City" />
             <InputClaim ClaimTypeReferenceId="external_State" PartnerClaimType="State" />
@@ -2903,6 +2884,32 @@
       <DisplayName>Local Account</DisplayName>
       <TechnicalProfiles>
 
+        <TechnicalProfile Id="LocalAccount-SelfAssertedFields-WithoutActivationCode">
+          <DisplayName>Sign up Field</DisplayName>
+          <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.SelfAssertedAttributeProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+          <Metadata>
+            <Item Key="IpAddressClaimReferenceId">IpAddress</Item>
+            <Item Key="ContentDefinitionReferenceId">api.localaccountsignup</Item>
+          </Metadata>
+          <CryptographicKeys>
+            <Key Id="issuer_secret" StorageReferenceId="B2C_1A_TokenSigningKeyContainer" />
+          </CryptographicKeys>
+          <OutputClaims>
+            <OutputClaim ClaimTypeReferenceId="external_FirstName" Required="true"/>
+            <OutputClaim ClaimTypeReferenceId="external_LastName" Required="true"/>
+            <OutputClaim ClaimTypeReferenceId="external_Gender" Required="true"/>
+            <OutputClaim ClaimTypeReferenceId="external_Street" Required="true"/>
+            <OutputClaim ClaimTypeReferenceId="external_Phone" Required="true"/>
+            <OutputClaim ClaimTypeReferenceId="external_City" Required="true"/>
+            <OutputClaim ClaimTypeReferenceId="external_State" Required="true"/>
+            <OutputClaim ClaimTypeReferenceId="external_Zip" Required="true"/>
+          </OutputClaims>
+          <OutputClaimsTransformations>
+            <OutputClaimsTransformation ReferenceId="CopyGivenNameFrom_External_FirstName" />
+            <OutputClaimsTransformation ReferenceId="CopySurNameFrom_External_LastName" />
+          </OutputClaimsTransformations>
+        </TechnicalProfile>
+
         <TechnicalProfile Id="LocalAccountSignUpWithLogonEmail-WithoutActivationCode-DFP">
           <DisplayName>Email signup</DisplayName>
           <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.SelfAssertedAttributeProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
@@ -2920,8 +2927,6 @@
           <DisplayClaims>            
             <DisplayClaim DisplayControlReferenceId="emailVerificationControl-InputOrVerify" />
             <DisplayClaim ClaimTypeReferenceId="external_DateOfBirth"/>
-            <DisplayClaim ClaimTypeReferenceId="givenName"/>
-            <DisplayClaim ClaimTypeReferenceId="surName"/>
             <DisplayClaim ClaimTypeReferenceId="newPassword" Required="true"/>
             <DisplayClaim ClaimTypeReferenceId="reenterPassword"/>
           </DisplayClaims>
@@ -2934,13 +2939,11 @@
             <OutputClaim ClaimTypeReferenceId="authenticationSource" />
             <OutputClaim ClaimTypeReferenceId="newUser" />
           
-            <!-- Optional claims, to be collected from the user -->
             <OutputClaim ClaimTypeReferenceId="external_DateOfBirth" Required="true"/>
             <OutputClaim ClaimTypeReferenceId="givenName" Required="true" />
             <OutputClaim ClaimTypeReferenceId="surName" Required="true"/>
           
             <OutputClaim ClaimTypeReferenceId="isActiveEmailSession"  DefaultValue="true" AlwaysUseDefaultValue="true"/>
-
             <OutputClaim ClaimTypeReferenceId="dfp_merchantRuleDecision" />
             <OutputClaim ClaimTypeReferenceId="dfp_Id" />
             <OutputClaim ClaimTypeReferenceId="dfp_TransactionReferenceId"/>
@@ -3006,7 +3009,7 @@
               </Preconditions>
             </ValidationTechnicalProfile>
 
-            <!-- <ValidationTechnicalProfile ReferenceId="RestApi-UserValidation-CreateUser">
+            <ValidationTechnicalProfile ReferenceId="RestApi-CreateUserWithoutValidationCode">
               <Preconditions>
                 <Precondition Type="ClaimsExist" ExecuteActionsIf="false">
                   <Value>dfp_merchantRuleDecision</Value>
@@ -3018,7 +3021,7 @@
                   <Action>SkipThisValidationTechnicalProfile</Action>
                 </Precondition>
               </Preconditions>
-            </ValidationTechnicalProfile> -->
+            </ValidationTechnicalProfile> 
 
             <ValidationTechnicalProfile ReferenceId="RestApi-DFP-CreateAccountStatus-Approved">
               <Preconditions>
@@ -3037,24 +3040,6 @@
           <UseTechnicalProfileForSessionManagement ReferenceId="SM-AAD" />
         </TechnicalProfile>
 
-        <TechnicalProfile Id="LocalAccount-SelfAssertedFields-WithoutActivationCode">
-          <DisplayName>Sign up Field</DisplayName>
-          <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.SelfAssertedAttributeProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
-          <Metadata>
-            <Item Key="IpAddressClaimReferenceId">IpAddress</Item>
-            <Item Key="ContentDefinitionReferenceId">api.localaccountsignup</Item>
-          </Metadata>
-          <CryptographicKeys>
-            <Key Id="issuer_secret" StorageReferenceId="B2C_1A_TokenSigningKeyContainer" />
-          </CryptographicKeys>
-          <OutputClaims>
-            <OutputClaim ClaimTypeReferenceId="external_Street" Required="true"/>
-            <OutputClaim ClaimTypeReferenceId="external_Phone" Required="true"/>
-            <OutputClaim ClaimTypeReferenceId="external_City" Required="true"/>
-            <OutputClaim ClaimTypeReferenceId="external_State" Required="true"/>
-            <OutputClaim ClaimTypeReferenceId="external_Zip" Required="true"/>
-          </OutputClaims>
-        </TechnicalProfile>
 
         <TechnicalProfile Id="VerifyUser-WithActivationCode-CollectCode">
           <DisplayName>Email signup</DisplayName>
@@ -3194,7 +3179,7 @@
             <DisplayClaim ClaimTypeReferenceId="reenterPassword"/>
           </DisplayClaims>
           <OutputClaims>
-            <OutputClaim ClaimTypeReferenceId="objectId"></OutputClaim>
+            <OutputClaim ClaimTypeReferenceId="objectId"/>
             <OutputClaim ClaimTypeReferenceId="email"/>
             <OutputClaim ClaimTypeReferenceId="newPassword" Required="true" />
             <OutputClaim ClaimTypeReferenceId="reenterPassword" Required="true" />
@@ -3202,6 +3187,7 @@
             <OutputClaim ClaimTypeReferenceId="authenticationSource" />
             <OutputClaim ClaimTypeReferenceId="newUser" />
 
+            <OutputClaim ClaimTypeReferenceId="external_DateOfBirth" Required="true"/>
             <OutputClaim ClaimTypeReferenceId="givenName" />
             <OutputClaim ClaimTypeReferenceId="surName" />
 
@@ -4319,7 +4305,7 @@
             </Precondition>
           </Preconditions>
           <ClaimsExchanges>
-            <ClaimsExchange Id="SignUpWithLogonEmail-WithoutActivationCodeExchange" TechnicalProfileReferenceId="LocalAccountSignUpWithLogonEmail-WithoutActivationCode-DFP" />
+            <ClaimsExchange Id="SignUp-Fields-WithoutActivationCodeExchange" TechnicalProfileReferenceId="LocalAccount-SelfAssertedFields-WithoutActivationCode" />
           </ClaimsExchanges>
         </OrchestrationStep>
 
@@ -4337,7 +4323,7 @@
             </Precondition>
           </Preconditions>
           <ClaimsExchanges>
-            <ClaimsExchange Id="SignUp-Fields-WithoutActivationCodeExchange" TechnicalProfileReferenceId="LocalAccount-SelfAssertedFields-WithoutActivationCode" />
+            <ClaimsExchange Id="SignUpWithLogonEmail-WithoutActivationCodeExchange" TechnicalProfileReferenceId="LocalAccountSignUpWithLogonEmail-WithoutActivationCode-DFP" />
           </ClaimsExchanges>
         </OrchestrationStep>
 
