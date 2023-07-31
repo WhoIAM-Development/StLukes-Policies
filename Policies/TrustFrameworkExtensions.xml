@@ -386,6 +386,10 @@
 
       <!-- #region TOTP claims-->
 
+      <ClaimType Id="totpIds">
+        <DataType>stringCollection</DataType>
+      </ClaimType>
+
       <ClaimType Id="totpIdentifier">
         <DisplayName>UserId, Phone number or Email which can present the user's identity</DisplayName>
         <DataType>string</DataType>
@@ -2672,6 +2676,70 @@
     <ClaimsProvider>
       <DisplayName>TOTP Claim providers</DisplayName>
       <TechnicalProfiles>
+
+        <TechnicalProfile Id="RestApi-ClearCertainTotps">
+          <DisplayName>RestApi-ClearTOTP</DisplayName>
+          <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.RestfulProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+          <Metadata>
+            <Item Key="ServiceUrl">{Settings:IntermediateAppUrl}/api/TotpFactors/Clear</Item>
+            <Item Key="AuthenticationType">Bearer</Item>
+            <Item Key="UseClaimAsBearerToken">bearerToken</Item>
+            <Item Key="SendClaimsIn">Body</Item>
+            <Item Key="AllowInsecureAuthInProduction">true</Item>
+            <Item Key="IncludeClaimResolvingInClaimsHandling">true</Item>
+          </Metadata>
+          <InputClaims>
+            <InputClaim ClaimTypeReferenceId="bearerToken" />
+            <InputClaim ClaimTypeReferenceId="objectId" PartnerClaimType="userId" />
+            <InputClaim ClaimTypeReferenceId="totpIds" PartnerClaimType="methodsIds" />
+          </InputClaims>
+          <OutputClaims>
+            <OutputClaim ClaimTypeReferenceId="numberOfAvailableDevices" DefaultValue="0" AlwaysUseDefaultValue="true" />
+          </OutputClaims>
+          <UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop" />
+        </TechnicalProfile>
+
+        <TechnicalProfile Id="RestApi-ClearAllTotps">
+          <DisplayName>RestApi-ClearTOTP</DisplayName>
+          <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.RestfulProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+          <Metadata>
+            <Item Key="ServiceUrl">{Settings:IntermediateAppUrl}/api/TotpFactors/ClearAll</Item>
+            <Item Key="AuthenticationType">Bearer</Item>
+            <Item Key="UseClaimAsBearerToken">bearerToken</Item>
+            <Item Key="SendClaimsIn">Body</Item>
+            <Item Key="AllowInsecureAuthInProduction">true</Item>
+            <Item Key="IncludeClaimResolvingInClaimsHandling">true</Item>
+          </Metadata>
+          <InputClaims>
+            <InputClaim ClaimTypeReferenceId="bearerToken" />
+            <InputClaim ClaimTypeReferenceId="objectId" PartnerClaimType="userId" />
+          </InputClaims>
+          <OutputClaims>
+            <OutputClaim ClaimTypeReferenceId="numberOfAvailableDevices" DefaultValue="0" AlwaysUseDefaultValue="true" />
+          </OutputClaims>
+          <UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop" />
+        </TechnicalProfile>
+
+        <TechnicalProfile Id="RestApi-GetTOTPs">
+          <DisplayName>RestApi-ClearTOTP</DisplayName>
+          <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.RestfulProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+          <Metadata>
+            <Item Key="ServiceUrl">{Settings:IntermediateAppUrl}/api/TotpFactors</Item>
+            <Item Key="AuthenticationType">Bearer</Item>
+            <Item Key="UseClaimAsBearerToken">bearerToken</Item>
+            <Item Key="SendClaimsIn">QueryString</Item>
+            <Item Key="AllowInsecureAuthInProduction">true</Item>
+            <Item Key="IncludeClaimResolvingInClaimsHandling">true</Item>
+          </Metadata>
+          <InputClaims>
+            <InputClaim ClaimTypeReferenceId="bearerToken" />
+            <InputClaim ClaimTypeReferenceId="objectId" PartnerClaimType="userId" />
+          </InputClaims>
+          <OutputClaims>
+            <OutputClaim ClaimTypeReferenceId="totpIds" PartnerClaimType="methodsIds" />
+          </OutputClaims>
+          <UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop" />
+        </TechnicalProfile>
 
         <!-- Begin the TOTP verification process.
               This technical profile is called right before the AzureMfa-VerifyOTP technical profile-->
@@ -5056,7 +5124,24 @@
           </ClaimsExchanges>
         </OrchestrationStep>
 
-        <OrchestrationStep Order="4" Type="InvokeSubJourney">
+        <OrchestrationStep Order="4" Type="ClaimsExchange">
+          <Preconditions>
+            <Precondition Type="ClaimsExist" ExecuteActionsIf="true">
+              <Value>bearerToken</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
+            <Precondition Type="ClaimEquals" ExecuteActionsIf="true">
+              <Value>changeMfa_Action</Value>
+              <Value>add</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
+          </Preconditions>
+          <ClaimsExchanges>
+            <ClaimsExchange Id="AcquireAccessToken" TechnicalProfileReferenceId="REST-AcquireAccessToken" />
+          </ClaimsExchanges>
+        </OrchestrationStep>
+
+        <OrchestrationStep Order="5" Type="InvokeSubJourney">
           <Preconditions>
             <Precondition Type="ClaimEquals" ExecuteActionsIf="false">
               <Value>changeMfa_Action</Value>
@@ -5069,7 +5154,7 @@
           </JourneyList>
         </OrchestrationStep>
 
-        <OrchestrationStep Order="5" Type="InvokeSubJourney">
+        <OrchestrationStep Order="6" Type="InvokeSubJourney">
           <Preconditions>
             <Precondition Type="ClaimEquals" ExecuteActionsIf="false">
               <Value>changeMfa_Action</Value>
@@ -5082,7 +5167,7 @@
           </JourneyList>
         </OrchestrationStep>
 
-        <OrchestrationStep Order="6" Type="InvokeSubJourney">
+        <OrchestrationStep Order="7" Type="InvokeSubJourney">
           <Preconditions>
             <Precondition Type="ClaimEquals" ExecuteActionsIf="false">
               <Value>changeMfa_Action</Value>
@@ -5095,7 +5180,7 @@
           </JourneyList>
         </OrchestrationStep>
 
-        <OrchestrationStep Order="7" Type="ClaimsExchange">
+        <OrchestrationStep Order="8" Type="ClaimsExchange">
           <ClaimsExchanges>
             <ClaimsExchange Id="SelfAssertedShowMfaSuccessfulExchange" TechnicalProfileReferenceId="SelfAsserted-ShowMessage-MfaUpdateSuccessful" />
           </ClaimsExchanges>
@@ -5161,6 +5246,23 @@
           </ClaimsExchanges>
         </OrchestrationStep>
 
+        <OrchestrationStep Order="6" Type="ClaimsExchange">
+          <Preconditions>
+            <Precondition Type="ClaimsExist" ExecuteActionsIf="false">
+              <Value>Change_MFAOption_TOTP</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
+            <Precondition Type="ClaimEquals" ExecuteActionsIf="false">
+              <Value>Change_MFAOption_TOTP</Value>
+              <Value>True</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
+          </Preconditions>
+          <ClaimsExchanges>
+            <ClaimsExchange Id="GetCurrentTotpIds" TechnicalProfileReferenceId="RestApi-ClearAllTotps" />
+          </ClaimsExchanges>
+        </OrchestrationStep>
+
       </OrchestrationSteps>
     </SubJourney>
 
@@ -5210,7 +5312,24 @@
           </JourneyList>
         </OrchestrationStep>
 
-        <OrchestrationStep Order="6" Type="InvokeSubJourney">
+        <OrchestrationStep Order="6" Type="ClaimsExchange">
+          <Preconditions>
+            <Precondition Type="ClaimsExist" ExecuteActionsIf="false">
+              <Value>Change_MFAOption_TOTP</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
+            <Precondition Type="ClaimEquals" ExecuteActionsIf="false">
+              <Value>Change_MFAOption_TOTP</Value>
+              <Value>True</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
+          </Preconditions>
+          <ClaimsExchanges>
+            <ClaimsExchange Id="GetCurrentTotpIds" TechnicalProfileReferenceId="RestApi-GetTOTPs" />
+          </ClaimsExchanges>
+        </OrchestrationStep>
+
+        <OrchestrationStep Order="7" Type="InvokeSubJourney">
           <Preconditions>
             <Precondition Type="ClaimsExist" ExecuteActionsIf="false">
               <Value>Change_MFAOption_TOTP</Value>
@@ -5225,6 +5344,23 @@
           <JourneyList>
             <Candidate SubJourneyReferenceId="TotpFactor-RegisterInput-NoSSO" />
           </JourneyList>
+        </OrchestrationStep>
+
+        <OrchestrationStep Order="8" Type="ClaimsExchange">
+          <Preconditions>
+            <Precondition Type="ClaimsExist" ExecuteActionsIf="false">
+              <Value>Change_MFAOption_TOTP</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
+            <Precondition Type="ClaimEquals" ExecuteActionsIf="false">
+              <Value>Change_MFAOption_TOTP</Value>
+              <Value>True</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
+          </Preconditions>
+          <ClaimsExchanges>
+            <ClaimsExchange Id="DeletePreviouslyRegisteredTotps" TechnicalProfileReferenceId="RestApi-ClearCertainTotps" />
+          </ClaimsExchanges>
         </OrchestrationStep>
 
       </OrchestrationSteps>
