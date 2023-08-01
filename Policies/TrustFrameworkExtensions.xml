@@ -1813,7 +1813,8 @@
           <InputClaims>
             <InputClaim ClaimTypeReferenceId="bearerToken" />
             <InputClaim ClaimTypeReferenceId="activationCode" PartnerClaimType="MyChartActivationCode"/>
-            <InputClaim ClaimTypeReferenceId="objectId" PartnerClaimType="ObjectId"/>
+            <InputClaim ClaimTypeReferenceId="objectId" PartnerClaimType="B2CObjectId"/>
+            <InputClaim ClaimTypeReferenceId="dateOfBirth" PartnerClaimType="DateOfBirth"/>
           </InputClaims>
           <OutputClaims>
             <OutputClaim ClaimTypeReferenceId="external_hasMyChartBeenLinked" PartnerClaimType="HasMyChartBeenLinked"/>
@@ -1835,7 +1836,6 @@
           </Metadata>
           <InputClaims>
             <InputClaim ClaimTypeReferenceId="bearerToken" />
-            <InputClaim ClaimTypeReferenceId="objectId" />
 
             <InputClaim ClaimTypeReferenceId="external_FirstName" PartnerClaimType="FirstName" />
             <InputClaim ClaimTypeReferenceId="external_LastName" PartnerClaimType="LastName" />
@@ -1883,6 +1883,7 @@
           </Metadata>
           <InputClaims>
             <InputClaim ClaimTypeReferenceId="bearerToken" />
+            <InputClaim ClaimTypeReferenceId="objectId" PartnerClaimType="B2CObjectId"></InputClaim>
             <InputClaim ClaimTypeReferenceId="external_SessionId" PartnerClaimType="sessionId"/>
             <InputClaim ClaimTypeReferenceId="external_SelectedAnswers" PartnerClaimType="answerIndex"/>            
           </InputClaims>
@@ -1948,7 +1949,7 @@
           </Metadata>
           <InputClaims>
             <InputClaim ClaimTypeReferenceId="bearerToken" />
-            <InputClaim ClaimTypeReferenceId="objectId" PartnerClaimType="ObjectId"/>
+            <InputClaim ClaimTypeReferenceId="objectId" PartnerClaimType="B2CObjectId"/>
             <InputClaim ClaimTypeReferenceId="email" PartnerClaimType="Email"/>
             <InputClaim ClaimTypeReferenceId="external_FirstName" PartnerClaimType="FirstName" />
             <InputClaim ClaimTypeReferenceId="external_LastName" PartnerClaimType="LastName" />
