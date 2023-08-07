@@ -2784,6 +2784,7 @@
           <OutputClaims>
             <OutputClaim ClaimTypeReferenceId="numberOfAvailableDevices" />
           </OutputClaims>
+          <UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop" />
         </TechnicalProfile>
 
         <!-- TOTP session manager-->
