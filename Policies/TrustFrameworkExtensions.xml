@@ -1783,7 +1783,7 @@
           </Metadata>
           <InputClaims>
             <InputClaim ClaimTypeReferenceId="bearerToken" />
-            <InputClaim ClaimTypeReferenceId="objectId" PartnerClaimType="objectId"/>
+            <InputClaim ClaimTypeReferenceId="objectId" PartnerClaimType="B2CObjectId"/>
           </InputClaims>
           <OutputClaims>
             <OutputClaim ClaimTypeReferenceId="external_FirstName" PartnerClaimType="FirstName"/>
