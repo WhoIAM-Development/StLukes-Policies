@@ -479,7 +479,7 @@
       </ClaimType>
 
       <ClaimType Id="userMessage">
-        <DisplayName>User Message</DisplayName>
+        <DisplayName></DisplayName>
         <DataType>string</DataType>
         <UserHelpText>Add help text here</UserHelpText>
         <UserInputType>Paragraph</UserInputType>
@@ -509,6 +509,9 @@
         <DisplayName>Activation code</DisplayName>
         <DataType>string</DataType>        
         <UserInputType>TextBox</UserInputType>
+        <Restriction>
+          <Pattern RegularExpression="^[A-Za-z0-9\-]{17}$" HelpText="Please enter exactly 17 alphanumeric characters and dashes." />
+        </Restriction>
       </ClaimType>
 
       <ClaimType Id="dateOfBirth">
@@ -640,6 +643,9 @@
         <DisplayName>Phone</DisplayName>
         <DataType>string</DataType>        
         <UserInputType>TextBox</UserInputType>
+        <Restriction>
+          <Pattern RegularExpression="^\d{10}$" HelpText="Please enter a 10-digit phone number." />
+        </Restriction>
       </ClaimType>
 
       <ClaimType Id="external_City">
@@ -651,13 +657,68 @@
       <ClaimType Id="external_State">
         <DisplayName>State</DisplayName>
         <DataType>string</DataType>        
-        <UserInputType>TextBox</UserInputType>
+        <UserInputType>DropdownSingleSelect</UserInputType>
+        <Restriction>
+          <Enumeration Text="Alabama" Value="AL" />
+          <Enumeration Text="Alaska" Value="AK" />
+          <Enumeration Text="Arizona" Value="AZ" />
+          <Enumeration Text="Arkansas" Value="AR" />
+          <Enumeration Text="California" Value="CA" />
+          <Enumeration Text="Colorado" Value="CO" />
+          <Enumeration Text="Connecticut" Value="CT" />
+          <Enumeration Text="Delaware" Value="DE" />
+          <Enumeration Text="Florida" Value="FL" />
+          <Enumeration Text="Georgia" Value="GA" />
+          <Enumeration Text="Hawaii" Value="HI" />
+          <Enumeration Text="Idaho" Value="ID" />
+          <Enumeration Text="Illinois" Value="IL" />
+          <Enumeration Text="Indiana" Value="IN" />
+          <Enumeration Text="Iowa" Value="IA" />
+          <Enumeration Text="Kansas" Value="KS" />
+          <Enumeration Text="Kentucky" Value="KY" />
+          <Enumeration Text="Louisiana" Value="LA" />
+          <Enumeration Text="Maine" Value="ME" />
+          <Enumeration Text="Maryland" Value="MD" />
+          <Enumeration Text="Massachusetts" Value="MA" />
+          <Enumeration Text="Michigan" Value="MI" />
+          <Enumeration Text="Minnesota" Value="MN" />
+          <Enumeration Text="Mississippi" Value="MS" />
+          <Enumeration Text="Missouri" Value="MO" />
+          <Enumeration Text="Montana" Value="MT" />
+          <Enumeration Text="Nebraska" Value="NE" />
+          <Enumeration Text="Nevada" Value="NV" />
+          <Enumeration Text="New Hampshire" Value="NH" />
+          <Enumeration Text="New Jersey" Value="NJ" />
+          <Enumeration Text="New Mexico" Value="NM" />
+          <Enumeration Text="New York" Value="NY" />
+          <Enumeration Text="North Carolina" Value="NC" />
+          <Enumeration Text="North Dakota" Value="ND" />
+          <Enumeration Text="Ohio" Value="OH" />
+          <Enumeration Text="Oklahoma" Value="OK" />
+          <Enumeration Text="Oregon" Value="OR" />
+          <Enumeration Text="Pennsylvania" Value="PA" />
+          <Enumeration Text="Rhode Island" Value="RI" />
+          <Enumeration Text="South Carolina" Value="SC" />
+          <Enumeration Text="South Dakota" Value="SD" />
+          <Enumeration Text="Tennessee" Value="TN" />
+          <Enumeration Text="Texas" Value="TX" />
+          <Enumeration Text="Utah" Value="UT" />
+          <Enumeration Text="Vermont" Value="VT" />
+          <Enumeration Text="Virginia" Value="VA" />
+          <Enumeration Text="Washington" Value="WA" />
+          <Enumeration Text="West Virginia" Value="WV" />
+          <Enumeration Text="Wisconsin" Value="WI" />
+          <Enumeration Text="Wyoming" Value="WY" />
+        </Restriction>
       </ClaimType>
 
       <ClaimType Id="external_Zip">
         <DisplayName>Zip</DisplayName>
         <DataType>string</DataType>        
         <UserInputType>TextBox</UserInputType>
+        <Restriction>
+          <Pattern RegularExpression="^\d{5}$" HelpText="Please enter a 5-digit zip code." />
+        </Restriction>
       </ClaimType>
 
       <ClaimType Id="external_SessionId">
