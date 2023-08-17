@@ -847,6 +847,10 @@
         <DataType>boolean</DataType>
       </ClaimType>
 
+      <ClaimType Id="experianAttemptedOnce">
+        <DataType>boolean</DataType>
+      </ClaimType>
+
     </ClaimsSchema>
     <ClaimsTransformations>
 
@@ -2126,6 +2130,15 @@
           </InputClaims>
           <OutputClaims>
             <OutputClaim ClaimTypeReferenceId="myChartIdLinkingSelectedOption"/>
+          </OutputClaims>
+          <UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop" />
+        </TechnicalProfile>
+
+        <TechnicalProfile Id="SetExperianAttemptedOnce">
+          <DisplayName>Validate User Chart Id</DisplayName>
+          <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.ClaimsTransformationProtocolProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+          <OutputClaims>
+            <OutputClaim ClaimTypeReferenceId="experianAttemptedOnce" DefaultValue="true" AlwaysUseDefaultValue="true"/>
           </OutputClaims>
           <UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop" />
         </TechnicalProfile>
@@ -3556,6 +3569,24 @@
           <ValidationTechnicalProfiles> 
             <ValidationTechnicalProfile ReferenceId="GenerateAnwersIndexCSV" />          
             <ValidationTechnicalProfile ReferenceId="RestApi-UserValidation-SubmitAnswer" />
+            <ValidationTechnicalProfile ReferenceId="SetExperianAttemptedOnce">
+              <Preconditions>
+                <Precondition Type="ClaimEquals" ExecuteActionsIf="true">
+                  <Value>external_IsIdentityVerified</Value>
+                  <Value>True</Value>
+                  <Action>SkipThisValidationTechnicalProfile</Action>
+                </Precondition>
+              </Preconditions>
+            </ValidationTechnicalProfile>
+            <ValidationTechnicalProfile ReferenceId="AAD-WriteExperianAttemptedOnce">
+              <Preconditions>
+                <Precondition Type="ClaimEquals" ExecuteActionsIf="true">
+                  <Value>external_IsIdentityVerified</Value>
+                  <Value>True</Value>
+                  <Action>SkipThisValidationTechnicalProfile</Action>
+                </Precondition>
+              </Preconditions>
+            </ValidationTechnicalProfile>
           </ValidationTechnicalProfiles>  
           <UseTechnicalProfileForSessionManagement ReferenceId="SM-AAD" />
         </TechnicalProfile>
@@ -3568,6 +3599,68 @@
           <OutputClaimsTransformations>
             <OutputClaimsTransformation ReferenceId="CopyEmailToSignInName"/>
           </OutputClaimsTransformations>
+        </TechnicalProfile>
+
+        <TechnicalProfile Id="SelfAsserted-CollectQuestionAnswers-SecondTry">
+          <DisplayName>Show Questions - SecondTry</DisplayName>
+          <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.SelfAssertedAttributeProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+          <Metadata>
+            <Item Key="IpAddressClaimReferenceId">IpAddress</Item>
+            <Item Key="ContentDefinitionReferenceId">api.selfasserted.collectQuestionAnswers</Item>
+          </Metadata>
+          <CryptographicKeys>
+            <Key Id="issuer_secret" StorageReferenceId="B2C_1A_TokenSigningKeyContainer" />
+          </CryptographicKeys>
+          <InputClaims>
+            <InputClaim ClaimTypeReferenceId="external_SessionId"/>
+
+            <InputClaim ClaimTypeReferenceId="external_Question_1"/>
+            <InputClaim ClaimTypeReferenceId="external_Question_1_Answers"/>
+
+            <InputClaim ClaimTypeReferenceId="external_Question_2"/>
+            <InputClaim ClaimTypeReferenceId="external_Question_2_Answers"/>
+
+            <InputClaim ClaimTypeReferenceId="external_Question_3"/>
+            <InputClaim ClaimTypeReferenceId="external_Question_3_Answers"/>
+
+            <InputClaim ClaimTypeReferenceId="external_Question_4"/>
+            <InputClaim ClaimTypeReferenceId="external_Question_4_Answers"/>
+
+            <InputClaim ClaimTypeReferenceId="external_Question_5"/>
+            <InputClaim ClaimTypeReferenceId="external_Question_5_Answers"/>
+            
+          </InputClaims>
+          <OutputClaims>
+
+            <OutputClaim ClaimTypeReferenceId="external_Question_1"/> 
+            <OutputClaim ClaimTypeReferenceId="external_Question_1_Answers"/> 
+            <OutputClaim ClaimTypeReferenceId="external_Question_1_Answers_Selected" Required="true"/> 
+
+            <OutputClaim ClaimTypeReferenceId="external_Question_2"/> 
+            <OutputClaim ClaimTypeReferenceId="external_Question_2_Answers"/> 
+            <OutputClaim ClaimTypeReferenceId="external_Question_2_Answers_Selected" Required="true"/> 
+
+            <OutputClaim ClaimTypeReferenceId="external_Question_3"/> 
+            <OutputClaim ClaimTypeReferenceId="external_Question_3_Answers"/> 
+            <OutputClaim ClaimTypeReferenceId="external_Question_3_Answers_Selected" Required="true"/> 
+
+            <OutputClaim ClaimTypeReferenceId="external_Question_4"/> 
+            <OutputClaim ClaimTypeReferenceId="external_Question_4_Answers"/>
+            <OutputClaim ClaimTypeReferenceId="external_Question_4_Answers_Selected" Required="true"/> 
+
+            <OutputClaim ClaimTypeReferenceId="external_Question_5"/> 
+            <OutputClaim ClaimTypeReferenceId="external_Question_5_Answers"/>  
+            <OutputClaim ClaimTypeReferenceId="external_Question_5_Answers_Selected" Required="true"/>
+
+            <OutputClaim ClaimTypeReferenceId="external_IsIdentityVerified"/> 
+
+            <OutputClaim ClaimTypeReferenceId="external_MyChartId"/> 
+          </OutputClaims>          
+          <ValidationTechnicalProfiles> 
+            <ValidationTechnicalProfile ReferenceId="GenerateAnwersIndexCSV" />          
+            <ValidationTechnicalProfile ReferenceId="RestApi-UserValidation-SubmitAnswer" />
+          </ValidationTechnicalProfiles>  
+          <UseTechnicalProfileForSessionManagement ReferenceId="SM-AAD" />
         </TechnicalProfile>
 
         <TechnicalProfile Id="LocalAccountDiscoveryUsingEmailAddress-Custom">
@@ -3819,6 +3912,40 @@
           </PersistedClaims>
           <OutputClaims>
             <OutputClaim ClaimTypeReferenceId="MFAOptionsPartial" PartnerClaimType="extension_MfaOptions" />
+          </OutputClaims>
+          <IncludeTechnicalProfile ReferenceId="AAD-Common" />
+        </TechnicalProfile>
+
+        <TechnicalProfile Id="AAD-WriteExperianAttemptedOnce">
+          <Metadata>
+            <Item Key="Operation">Write</Item>
+            <Item Key="RaiseErrorIfClaimsPrincipalDoesNotExist">true</Item>
+            <Item Key="AllowGenerationOfClaimsWithNullValues">true</Item>
+          </Metadata>
+          <IncludeInSso>false</IncludeInSso>
+          <InputClaims>
+            <InputClaim ClaimTypeReferenceId="objectId" Required="true" />
+          </InputClaims>
+          <PersistedClaims>
+            <PersistedClaim ClaimTypeReferenceId="objectId" />
+            <PersistedClaim ClaimTypeReferenceId="experianAttemptedOnce" PartnerClaimType="extension_experianAttemptedOnce" />
+          </PersistedClaims>
+          <IncludeTechnicalProfile ReferenceId="AAD-Common" />
+        </TechnicalProfile>
+
+        <TechnicalProfile Id="AAD-ReadExperianAttemptedOnce">
+          <Metadata>
+            <Item Key="Operation">Read</Item>
+            <Item Key="RaiseErrorIfClaimsPrincipalDoesNotExist">true</Item>
+          </Metadata>
+          <IncludeInSso>false</IncludeInSso>
+          <InputClaims>
+            <InputClaim ClaimTypeReferenceId="objectId" Required="true" />
+          </InputClaims>
+          <OutputClaims>
+            <!-- Required claims -->
+            <OutputClaim ClaimTypeReferenceId="objectId" />
+            <OutputClaim ClaimTypeReferenceId="experianAttemptedOnce" PartnerClaimType="extension_experianAttemptedOnce" DefaultValue="false"/>
           </OutputClaims>
           <IncludeTechnicalProfile ReferenceId="AAD-Common" />
         </TechnicalProfile>
@@ -4616,9 +4743,20 @@
       <OrchestrationSteps>
 
         <OrchestrationStep Order="1" Type="ClaimsExchange">
+          <ClaimsExchanges>
+            <ClaimsExchange Id="AAD-ReadExperianAttemptedOnce" TechnicalProfileReferenceId="AAD-ReadExperianAttemptedOnce" />
+          </ClaimsExchanges>
+        </OrchestrationStep>
+
+        <OrchestrationStep Order="2" Type="ClaimsExchange">
           <Preconditions>
             <Precondition Type="ClaimsExist" ExecuteActionsIf="true">
               <Value>bearerToken</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
+            <Precondition Type="ClaimEquals" ExecuteActionsIf="true">
+              <Value>experianAttemptedOnce</Value>
+              <Value>True</Value>
               <Action>SkipThisOrchestrationStep</Action>
             </Precondition>
           </Preconditions>
@@ -4627,26 +4765,88 @@
           </ClaimsExchanges>
         </OrchestrationStep>
 
-        <OrchestrationStep Order="2" Type="ClaimsExchange">
+        <OrchestrationStep Order="3" Type="ClaimsExchange">
+          <Preconditions>
+            <Precondition Type="ClaimEquals" ExecuteActionsIf="true">
+              <Value>experianAttemptedOnce</Value>
+              <Value>True</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
+          </Preconditions>
           <ClaimsExchanges>
             <ClaimsExchange Id="GetUserDetails" TechnicalProfileReferenceId="RestApi-GetUserDetails" />
           </ClaimsExchanges>
         </OrchestrationStep>
 
-        <OrchestrationStep Order="3" Type="ClaimsExchange">
+        <OrchestrationStep Order="4" Type="ClaimsExchange">
+          <Preconditions>
+            <Precondition Type="ClaimEquals" ExecuteActionsIf="true">
+              <Value>experianAttemptedOnce</Value>
+              <Value>True</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
+          </Preconditions>
           <ClaimsExchanges>
             <ClaimsExchange Id="SelfAsserted-CollectDemoGraphicsExchange" TechnicalProfileReferenceId="SelfAsserted-CollectDemoGraphics" />
           </ClaimsExchanges>
         </OrchestrationStep>
 
-        <OrchestrationStep Order="4" Type="ClaimsExchange">
+        <OrchestrationStep Order="5" Type="ClaimsExchange">
+          <Preconditions>
+            <Precondition Type="ClaimEquals" ExecuteActionsIf="true">
+              <Value>experianAttemptedOnce</Value>
+              <Value>True</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
+          </Preconditions>
           <ClaimsExchanges>
             <ClaimsExchange Id="SelfAsserted-CollectQuestionAnswersExchange" TechnicalProfileReferenceId="SelfAsserted-CollectQuestionAnswers" />
           </ClaimsExchanges>
         </OrchestrationStep>
 
-        <OrchestrationStep Order="5" Type="ClaimsExchange">
+        <OrchestrationStep Order="6" Type="ClaimsExchange">
           <Preconditions>
+            <Precondition Type="ClaimEquals" ExecuteActionsIf="true">
+              <Value>experianAttemptedOnce</Value>
+              <Value>True</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
+            <Precondition Type="ClaimEquals" ExecuteActionsIf="true">
+              <Value>external_IsIdentityVerified</Value>
+              <Value>True</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
+          </Preconditions>
+          <ClaimsExchanges>
+            <ClaimsExchange Id="GetQuestionsAgain" TechnicalProfileReferenceId="RestApi-UserValidation-GetQuestions" />
+          </ClaimsExchanges>
+        </OrchestrationStep>
+
+        <OrchestrationStep Order="7" Type="ClaimsExchange">
+          <Preconditions>
+            <Precondition Type="ClaimEquals" ExecuteActionsIf="true">
+              <Value>experianAttemptedOnce</Value>
+              <Value>True</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
+            <Precondition Type="ClaimEquals" ExecuteActionsIf="true">
+              <Value>external_IsIdentityVerified</Value>
+              <Value>True</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
+          </Preconditions>
+          <ClaimsExchanges>
+            <ClaimsExchange Id="SelfAsserted-CollectQuestionAnswersExchange-SecondTry" TechnicalProfileReferenceId="SelfAsserted-CollectQuestionAnswers-SecondTry" />
+          </ClaimsExchanges>
+        </OrchestrationStep>
+
+        <OrchestrationStep Order="8" Type="ClaimsExchange">
+          <Preconditions>
+            <Precondition Type="ClaimEquals" ExecuteActionsIf="true">
+              <Value>experianAttemptedOnce</Value>
+              <Value>False</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
             <Precondition Type="ClaimEquals" ExecuteActionsIf="true">
               <Value>external_IsIdentityVerified</Value>
               <Value>True</Value>
