@@ -519,6 +519,7 @@
         <DataType>date</DataType>
         <UserHelpText>The date on which you were born.</UserHelpText>
         <UserInputType>DateTimeDropdown</UserInputType>
+        <PredicateValidationReference Id="CustomDateRange" />
       </ClaimType>
 
       <ClaimType Id="temp_objectId">
@@ -585,6 +586,7 @@
         <DataType>dateTime</DataType>
         <UserHelpText>The date on which you were born.</UserHelpText>
         <UserInputType>DateTimeDropdown</UserInputType>
+        <PredicateValidationReference Id="CustomDateRange" />
       </ClaimType>
 
       <ClaimType Id="external_Gender">
@@ -852,6 +854,26 @@
       </ClaimType>
 
     </ClaimsSchema>
+    <Predicates>
+      <Predicate Id="DateRange" Method="IsDateRange" HelpText="The date must be between 01-01-1900 and today.">
+        <Parameters>
+          <Parameter Id="Minimum">1900-01-01</Parameter>
+          <Parameter Id="Maximum">Today</Parameter>
+        </Parameters>
+      </Predicate>
+    </Predicates>
+
+    <PredicateValidations>
+      <PredicateValidation Id="CustomDateRange">
+      <PredicateGroups>
+        <PredicateGroup Id="DateRangeGroup">
+          <PredicateReferences>
+            <PredicateReference Id="DateRange" />
+          </PredicateReferences>
+        </PredicateGroup>
+      </PredicateGroups>
+      </PredicateValidation>
+    </PredicateValidations>
     <ClaimsTransformations>
 
       <ClaimsTransformation Id="AssertAuthFlowBroken" TransformationMethod="AssertBooleanClaimIsEqualToValue">
