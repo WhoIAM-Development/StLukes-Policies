@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<TrustFrameworkPolicy xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns="http://schemas.microsoft.com/online/cpim/schemas/2013/06"
+  PolicySchemaVersion="0.3.0.0"
+  TenantId="{Settings:TenantShort}.onmicrosoft.com"
+  PolicyId="B2C_1A_{Settings:PolicySet}TrustFrameworkExtensions_Saml"
+  PublicPolicyUri="http://{Settings:TenantShort}.onmicrosoft.com/B2C_1A_{Settings:PolicySet}TrustFrameworkExtensions_Saml">
+
+
+  <!-- Build Number: {Settings:Build.BuildNumber}_{Settings:Release.ReleaseName} -->
+
+  <BasePolicy>
+    <TenantId>{Settings:TenantShort}.onmicrosoft.com</TenantId>
+    <PolicyId>B2C_1A_{Settings:PolicySet}TrustFrameworkExtensions</PolicyId>
+  </BasePolicy>
+
+  <ClaimsProviders>
+    <ClaimsProvider>
+      <DisplayName>Token Issuer</DisplayName>
+      <TechnicalProfiles>
+
+        <TechnicalProfile Id="ClaimsIssuer">
+          <DisplayName>Claims Issuer (SAML)</DisplayName>
+          <Protocol Name="SAML2" />
+          <OutputTokenFormat>SAML2</OutputTokenFormat>
+          <Metadata>
+            <Item Key="IssuerUri">{Settings:SAMLAppIssuerUri}</Item>
+          </Metadata>
+          <CryptographicKeys>
+            <Key Id="SamlAssertionSigning" StorageReferenceId="{Settings:SAMLSigningCertificateName}"/>
+            <Key Id="SamlMessageSigning" StorageReferenceId="{Settings:SAMLSigningCertificateName}"/>
+          </CryptographicKeys>
+          <InputClaims />
+          <OutputClaims />
+          <UseTechnicalProfileForSessionManagement ReferenceId="SM-Saml-issuer"/>
+        </TechnicalProfile>
+
+        <TechnicalProfile Id="SM-Saml-issuer">
+          <DisplayName>Session Management Provider</DisplayName>
+          <Protocol Name="Proprietary" Handler="Web.TPEngine.SSO.SamlSSOSessionProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"/>
+        </TechnicalProfile>
+
+      </TechnicalProfiles>
+    </ClaimsProvider>
+  </ClaimsProviders>
+
+</TrustFrameworkPolicy>

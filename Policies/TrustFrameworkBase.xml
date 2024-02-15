@@ -1208,7 +1208,7 @@
     <ClaimsProvider>
       <DisplayName>Token Issuer</DisplayName>
       <TechnicalProfiles>
-        <TechnicalProfile Id="JwtIssuer">
+        <TechnicalProfile Id="ClaimsIssuer">
           <DisplayName>JWT Issuer</DisplayName>
           <Protocol Name="OpenIdConnect" />
           <OutputTokenFormat>JWT</OutputTokenFormat>
@@ -1511,7 +1511,7 @@
           </ClaimsExchanges>
         </OrchestrationStep>
 
-        <OrchestrationStep Order="12" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="JwtIssuer" />
+        <OrchestrationStep Order="12" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="ClaimsIssuer" />
 
         <!-- Track that we have successfully sent a token -->
         <OrchestrationStep Order="13" Type="ClaimsExchange">
@@ -1610,7 +1610,7 @@
           </ClaimsExchanges>
         </OrchestrationStep>
 
-        <OrchestrationStep Order="12" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="JwtIssuer" />
+        <OrchestrationStep Order="12" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="ClaimsIssuer" />
 
         <!-- Track that we have successfully sent a token -->
         <OrchestrationStep Order="13" Type="ClaimsExchange">
@@ -1692,7 +1692,7 @@
           </ClaimsExchanges>
         </OrchestrationStep>
 
-        <OrchestrationStep Order="11" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="JwtIssuer" />
+        <OrchestrationStep Order="11" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="ClaimsIssuer" />
 
         <!-- Track that we have successfully sent a token -->
         <OrchestrationStep Order="12" Type="ClaimsExchange">

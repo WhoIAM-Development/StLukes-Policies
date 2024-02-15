@@ -54,11 +54,19 @@
       </ClaimType>
 
        <ClaimType Id="dfp_riskScore">
-        <DataType>int</DataType>
+        <DataType>long</DataType>
       </ClaimType>
 
        <ClaimType Id="dfp_botScore">
-        <DataType>int</DataType>
+        <DataType>long</DataType>
+      </ClaimType>
+
+      <ClaimType Id="dfp_riskScore_string">
+        <DataType>string</DataType>
+      </ClaimType>
+
+      <ClaimType Id="dfp_botScore_string">
+        <DataType>string</DataType>
       </ClaimType>
 
       <ClaimType Id="dfp_decision_constvalue_approve">
@@ -1540,6 +1548,24 @@
         </OutputClaims>
       </ClaimsTransformation>
 
+      <ClaimsTransformation Id="CreateDfpRiskScoreString" TransformationMethod="ConvertNumberToStringClaim">
+        <InputClaims>
+          <InputClaim ClaimTypeReferenceId="dfp_riskScore" TransformationClaimType="inputClaim" />
+        </InputClaims>
+        <OutputClaims>
+          <OutputClaim ClaimTypeReferenceId="dfp_riskScore_string" TransformationClaimType="outputClaim" />
+        </OutputClaims>
+      </ClaimsTransformation>
+
+      <ClaimsTransformation Id="CreateDfpBotScoreString" TransformationMethod="ConvertNumberToStringClaim">
+        <InputClaims>
+          <InputClaim ClaimTypeReferenceId="dfp_botScore" TransformationClaimType="inputClaim" />
+        </InputClaims>
+        <OutputClaims>
+          <OutputClaim ClaimTypeReferenceId="dfp_botScore_string" TransformationClaimType="outputClaim" />
+        </OutputClaims>
+      </ClaimsTransformation>
+
     </ClaimsTransformations>
 
     <DisplayControls>
@@ -1708,6 +1734,10 @@
             <OutputClaim ClaimTypeReferenceId="dfp_EmailDomin" PartnerClaimType="EmailDomin"/>
             <OutputClaim ClaimTypeReferenceId="dfp_EmailPattern" PartnerClaimType="EmailPattern"/>
           </OutputClaims>
+          <OutputClaimsTransformations>
+            <OutputClaimsTransformation ReferenceId="CreateDfpRiskScoreString"/>
+            <OutputClaimsTransformation ReferenceId="CreateDfpBotScoreString"/>
+          </OutputClaimsTransformations>
         </TechnicalProfile>
 
         <TechnicalProfile Id="RestApi-DFP-CreateAccountStatus">
@@ -1801,6 +1831,10 @@
             <OutputClaim ClaimTypeReferenceId="dfp_EmailDomin" PartnerClaimType="EmailDomin"/>
             <OutputClaim ClaimTypeReferenceId="dfp_EmailPattern" PartnerClaimType="EmailPattern"/>
           </OutputClaims>
+          <OutputClaimsTransformations>
+            <OutputClaimsTransformation ReferenceId="CreateDfpRiskScoreString"/>
+            <OutputClaimsTransformation ReferenceId="CreateDfpBotScoreString"/>
+          </OutputClaimsTransformations>
         </TechnicalProfile>
 
         <TechnicalProfile Id="RestApi-DFP-LoginAccountStatus">
@@ -4378,7 +4412,7 @@
           </JourneyList>
         </OrchestrationStep>
 
-        <OrchestrationStep Order="12" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="JwtIssuer" />
+        <OrchestrationStep Order="12" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="ClaimsIssuer" />
 
         <!-- Track that we have successfully sent a token -->
         <OrchestrationStep Order="13" Type="ClaimsExchange">
@@ -4452,7 +4486,7 @@
           </JourneyList>
         </OrchestrationStep>
 
-        <OrchestrationStep Order="8" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="JwtIssuer" />
+        <OrchestrationStep Order="8" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="ClaimsIssuer" />
 
         <!-- Track that we have successfully sent a token -->
         <OrchestrationStep Order="9" Type="ClaimsExchange">
@@ -4538,7 +4572,7 @@
           </ClaimsExchanges>
         </OrchestrationStep>
 
-        <OrchestrationStep Order="10" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="JwtIssuer" />
+        <OrchestrationStep Order="10" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="ClaimsIssuer" />
 
         <!-- Track that we have successfully sent a token -->
         <OrchestrationStep Order="11" Type="ClaimsExchange">
